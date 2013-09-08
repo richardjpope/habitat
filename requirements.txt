@@ -1,2 +1,15 @@
-Flask==0.9
-Jinja2==2.6
+Flask==0.10.1
+Flask-Script==0.6.2
+Flask-WTF==0.9.1
+Jinja2==2.7.1
+MarkupSafe==0.18
+WTForms==1.0.4
+Werkzeug==0.9.4
+flask-mongoengine==0.7.0
+geojson==1.0.1
+itsdangerous==0.23
+mongoengine==0.8.4
+pymongo==2.6.2
+pyshp==1.2.0
+simplejson==3.3.0
+wsgiref==0.1.2
