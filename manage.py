@@ -2,6 +2,7 @@ from flask import Flask
 from flask.ext.script import Manager, Option, Command
 import shapefile
 import models
+import os
 
 app = Flask(__name__)
 
@@ -14,7 +15,10 @@ class ImportOSM(Command):
 
         print "Starting to read shape files"
         #https://pypi.python.org/pypi/pyshp#reading-shapefiles
-        shape_reader = shapefile.Reader("/Users/richardpope/Downloads/greater-london-latest/buildings")
+        dir = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(dir, "import-data/greater-london-latest/buildings")
+        print path
+        shape_reader = shapefile.Reader(path)
         records = shape_reader.records()
         shapes = shape_reader.shapes()
 
