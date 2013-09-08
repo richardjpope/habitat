@@ -39,11 +39,13 @@ def results():
 
 @app.route("/api/")
 def api():
-    #building: http://localhost:5000/api/-0.1206612/51.517323
-    #road: http://localhost:5000/api/-0.120442/51.517546
-    buildings = models.Fence.objects(polygon__geo_intersects=[float(request.args.get('lat')), float(request.args.get('lng'))], category='building')
+    #building: http://localhost:5000/api/?lng=-0.1206612&lat=51.517323
+    #road: http://localhost:5000/api/?lng=-0.120442&lat=51.517546
+    #buildings = models.Fence.objects(polygon__geo_intersects=[float(-0.1206612), float(51.517323)], category='building')
+    buildings = models.Fence.objects(polygon__geo_intersects=[float(request.args.get('lng')), float(request.args.get('lat'))], category='building')
+    print len(buildings)
     data = {
-        'outside' : len(buildings) > 0
+        'outside' : len(buildings) == 0
     }
 
     response = Response(json.dumps(data), status=200, mimetype='application/json')
