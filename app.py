@@ -3,11 +3,12 @@ from flask.ext.mongoengine import MongoEngine
 import jinja2
 import os
 import models
+import re
 
 # settings
 MONGO_URL = os.environ.get("MONGOHQ_URL")
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "fdsfdsfdsnkvdfksnvfdnklfd"
+
 if MONGO_URL:
     credentials = re.sub(r"(.*?)//(.*?)(@hatch)", r"\2",MONGO_URL)
     username = credentials.split(":")[0]
