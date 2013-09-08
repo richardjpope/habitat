@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+    <script type="text/javascript">
+        function handleResult(){
+            if (this['outside']) {
+                $('#activity-outside').attr('class', 'yes');
+                $('#activity-outside').html('Yes');
+            }else{
+                $('#activity-outside').attr('class', 'no');
+                $('#activity-outside').html('No');
+            }
+        }
+        checkActivity(handleResult);
+    </script>
+    <dl class="results">
+        <dt class="notimplemented">Moving</dt>
+        <dd class="notimplemented">Not implemented</dd>
+        <dt class="notimplemented">In a park</dt>
+        <dd class="notimplemented">Not implemented</dd>
+        <dt class="notimplemented">On a train</dt>
+        <dd class="notimplemented">Not implemented</dd>
+        <dt class="notimplemented">Jumping</dt>
+        <dd class="notimplemented">Not implemented</dd>
+        <dt class="notimplemented">On a boat</dt>
+        <dd class="notimplemented">Not implemented</dd>
+        <dt>Outside</dt>
+        <dd id="activity-outside">Checking ...</dd>
+    </dl>
+{% endblock %}
