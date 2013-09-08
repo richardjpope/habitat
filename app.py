@@ -14,7 +14,7 @@ if MONGO_URL:
     username = credentials.split(":")[0]
     password = credentials.split(":")[1]
     app.config["MONGODB_DB"] = MONGO_URL.split("/")[-1]
-    connect(
+    MongoEngine.connect(
         MONGO_URL.split("/")[-1],
         host=MONGO_URL,
         port=1043,
