@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, render_template, json, Response
-from flask.ext.mongoengine import MongoEngine, connect
+from flask.ext.mongoengine import MongoEngine
+from mongoengine import connect
 import jinja2
 import os
 import models
