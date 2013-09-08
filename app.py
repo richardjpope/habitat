@@ -5,7 +5,21 @@ import os
 import models
 
 # settings
+MONGO_URL = os.environ.get("MONGOHQ_URL")
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "fdsfdsfdsnkvdfksnvfdnklfd"
+if MONGO_URL:
+    credentials = re.sub(r"(.*?)//(.*?)(@hatch)", r"\2",MONGO_URL)
+    username = credentials.split(":")[0]
+    password = credentials.split(":")[1]
+    app.config["MONGODB_DB"] = MONGO_URL.split("/")[-1]
+    connect(
+        MONGO_URL.split("/")[-1],
+        host=MONGO_URL,
+        port=1043,
+        username=username,
+        password=password
+    )
 app.config.update(
     DEBUG = True,
     MONGODB_SETTINGS = {'DB': "openactivity"}
