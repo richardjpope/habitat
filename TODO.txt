@@ -1,0 +1,1 @@
+* handle when cannot get users location

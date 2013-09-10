@@ -6,6 +6,15 @@ import os
 
 app = Flask(__name__)
 
+class DownloadOSM(Command):
+
+    def run(self):
+
+        print "hello"
+        data_dir = '%s/import-data' % os.path.dirname(os.path.abspath(__file__))
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+
 class ImportOSM(Command):
 
     def run(self):
@@ -30,6 +39,7 @@ class ImportOSM(Command):
 
 manager = Manager(app)
 manager.add_command('import-osm', ImportOSM())
+manager.add_command('download-osm', DownloadOSM())
 
 if __name__ == "__main__":
     manager.run()
