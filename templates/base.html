@@ -8,20 +8,20 @@
         <script type="text/javascript" src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.js') }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-        <title>Open Activity</title>
+        <title>Habitat</title>
 </head>
 <body>
 
     <div class="container">
-      <div class="header">
+      <!-- <div class="header">
         <ul class="nav nav-pills pull-right">
           <li class="active"><a href="/">Home</a></li>
           <li><a href="{{ url_for('results') }}">Try</a></li>
           <li><a href="https://github.com/memespring/open-activity">Docs and code</a></li>
         </ul>
-        <h3 class="text-muted"><a href="/">Open Activity</a></h3>
+        <h3 class="text-muted"><a href="/"><span class="glyphicon glyphicon-tree-deciduous"></span> Habitat</a></h3>
       </div>
-
+ -->
       {% block content %}
       {% endblock %}
 

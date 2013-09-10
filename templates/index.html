@@ -1,14 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
   <div class="jumbotron">
-    <h1>Open Activity</h1>
+    <h1><span class="glyphicon glyphicon-tree-deciduous"></span> Habitat</h1>
     <p class="lead">
-        Tools for really responsive design.
+        A Javascript library &amp; web API for Really Responsive Design
     </p>
-    <p><a class="btn btn-lg btn-success" href="{{ url_for('results') }}">Try it out</a></p>
-  </div>
-
-  <div class="row">
 
   </div>
+
+    <script type="text/javascript">
+        function handleResult(){
+            if (this['outside']) {
+                $('#activity-outside').attr('class', 'yes');
+                $('#activity-outside').html('<span class="glyphicon glyphicon-ok-sign">Yes</span>');
+            }else{
+                $('#activity-outside').attr('class', 'no');
+                $('#activity-outside').html('No');
+            }
+        }
+        checkActivity(handleResult);
+    </script>
+    <table id="results">
+        <tr>
+            <td class="notimplemented">Moving</td>
+            <td class="notimplemented">Not implemented</td>
+        </tr>
+        <tr>
+            <td class="notimplemented">In a park</td>
+            <td class="notimplemented">Not implemented</td>
+        </tr>
+        <tr>
+            <td class="notimplemented">On a train</td>
+            <td class="notimplemented">Not implemented</td>
+        </tr>
+        <tr>
+            <td class="notimplemented">Jumping</td>
+            <td class="notimplemented">Not implemented</td>
+        </tr>
+        <tr>
+            <td class="notimplemented">On a boat</td>
+            <td class="notimplemented">Not implemented</td>
+        </tr>
+        <tr>
+            <td>Outside</td>
+            <td id="activity-outside">Checking ...</td>
+        </tr>
+    </table>
 {% endblock %}
