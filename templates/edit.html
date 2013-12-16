@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
  <textarea id="edit">
- 	
+Feature: showing off behave
+Scenario: In a park
+     Given I am in a "park"
+     When the weather looks like "rain"
+     Then send me a message "Watch out, looks like rain!" via "SMS"
  </textarea>
+
+ <script type="text/javascript">
+ 	var myCodeMirror = CodeMirror.fromTextArea($('#edit')[0]);
+ </script>
+
 {% endblock %}

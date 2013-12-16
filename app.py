@@ -1,10 +1,14 @@
-from flask import Flask, request, redirect, render_template, json, Response
+from flask import Flask, request, redirect, render_template, json, Response, url_for, flash
+from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.mongoengine import MongoEngine
 from mongoengine import connect
 import jinja2
 import os
 import models
+import forms
 import re
+import os
+import glob
 
 # settings
 MONGO_URL = os.environ.get("MONGOHQ_URL")
@@ -24,22 +28,75 @@ if MONGO_URL:
     )
 app.config.update(
     DEBUG = True,
-    MONGODB_SETTINGS = {'DB': "openactivity"}
+    MONGODB_SETTINGS = {'DB': "openactivity"},
+    SECRET_KEY = 'fmdnkslr4u8932b3n2',
 )
 
+
+toolbar = DebugToolbarExtension(app)
 db = MongoEngine(app)
 
 @app.route("/")
 def index():
-    return render_template('index.html')
+    scenarios = []
+    from behave import parser
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    scenarios_dir = os.path.join(root_dir, 'scenarios')
+    for file_name in glob.glob(scenarios_dir + '/*.feature'):
+        # file_ref = open(file_name)
+        # scenarios.append(file_ref.read())
+        print parser.parse_file(file_name).scenarios[0].steps
+        #scenarios.append(parser.parse_file(file_name).scenarios[0])
+    return render_template('index.html', scenarios=scenarios)
 
 @app.route("/edit")
 def edit():
     return render_template('edit.html')
 
-@app.route("/me")
-def results():
-    return render_template('results.html')
+@app.route("/settings")
+def settings():
+    return render_template('settings.html')
+
+@app.route("/settings/foursquare", methods=['GET', 'POST'])
+def foursquare_settings():
+
+    import foursquare
+
+    form = forms.FoursquareForm(request.form)
+    setting = models.Setting.objects.get(key='foursquare-auth') # add default
+    access_token = None
+
+    #check for auth code from foursquare
+    access_code = request.args.get('code', None)
+    if request.method == 'GET' and access_code:
+
+        client = foursquare.Foursquare(client_id=setting.value['client-id'], client_secret=setting.value['client-secret'], redirect_uri='http://localhost:5000/settings/foursquare')
+
+        access_token = client.oauth.get_token(access_code)
+
+        flash('Your Foursquare account has been linked', 'success')
+        setting.value['access_token'] = access_token
+        setting.save()
+
+    #set initial data
+    if request.method == 'GET' and setting:
+        form.client_id.data = setting.value['client-id']
+        form.client_secret.data = setting.value['client-secret']
+
+    #save
+    if request.method == 'POST' and form.validate():
+        if not setting:
+            setting = models.Setting()
+        setting.key = 'foursquare-auth'
+        setting.value = {'client-id': form.client_id.data, 'client-secret': form.client_secret.data, 'access-token': access_token}
+        setting = setting.save()
+
+        client = foursquare.Foursquare(client_id=setting.value['client-id'], client_secret=setting.value['client-secret'], redirect_uri='http://localhost:5000/settings/foursquare')
+
+        #return redirect(url_for('settings'))
+        return redirect(client.oauth.auth_url())
+
+    return render_template('foursquare_settings.html', form=form, setting=setting)
 
 @app.route("/api/")
 def api():

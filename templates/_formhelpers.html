@@ -1,0 +1,31 @@
+{% macro render_field(field) %}
+    <div class="form-group {% if field.errors %}has-error{% endif %}">
+        {{ field.label(class_="control-label") }}
+        {{ field(class_="form-control", **kwargs)|safe }}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <span class="help-block">{{error}}</span>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro render_checkbox(field) %}
+    <div class="checkbox">
+        {{ field.label(class_="control-label") }}
+        {{ field() }}
+    </div>
+{% endmacro %}
+
+{% macro render_slider(field, lable1, lable2) %}
+    <div class="form-group {% if field.errors %}has-error{% endif %}">
+    	{{lable1}}
+        <input type="text" id="{{field.id}}" name="{{field.name}}" value="{{field.data}}" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="{{field.data}}" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="hide">
+        {{lable2}}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <span class="help-block">{{error}}</span>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endmacro %}

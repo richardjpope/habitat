@@ -12,7 +12,6 @@ def step_impl(context):
 def step_impl(context):
     assert context.failed is False
 
-
 @given('I am in a "{fence}"')
 def step_impl(context, fence):
     pass

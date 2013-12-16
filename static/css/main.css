@@ -1,3 +1,8 @@
 /* Space out content a bit */
-body {padding-top: 20px;padding-bottom: 20px;}
+body {padding-top: 80px;padding-bottom: 20px;}
 a {}
+
+/* Settings */
+/*.settings .panel-heading {position: relative}
+.settings .panel-heading label {padding-left:5px;}
+.settings .panel-heading label {float:right; position:relative; top:-1.3em;}*/

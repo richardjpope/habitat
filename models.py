@@ -8,3 +8,7 @@ class Fence(db.DynamicDocument):
 class Event(db.DynamicDocument):
     location = db.PointField()
     occcured_at = db.DateTimeField()
+
+class Setting(db.Document):
+    key = db.StringField(max_length=25, required=True, unique=True)
+    value = db.DictField(required=True)
