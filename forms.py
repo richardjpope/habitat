@@ -5,6 +5,6 @@ class FoursquareForm(Form):
     client_id = TextField('Client ID', [validators.Required()])
     client_secret = TextField('Client secret', [validators.Required()])
 
-    # def validate_secret(form, field):
-
-    # 	raise validators.ValidationError('Invalid client ID or client secret')
+class TwitterForm(Form):
+    consumer_key = TextField('Consumer key', [validators.Required()])
+    consumer_secret = TextField('Consumer secret', [validators.Required()])

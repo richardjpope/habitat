@@ -6,6 +6,9 @@ class Fence(db.DynamicDocument):
     polygon = db.PolygonField()
 
 class Event(db.DynamicDocument):
+    occcured_at = db.DateTimeField()
+
+class Location(db.DynamicDocument):
     location = db.PointField()
     occcured_at = db.DateTimeField()
 

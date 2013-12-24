@@ -22,3 +22,4 @@ requests-oauthlib==0.4.0
 simplejson==3.3.0
 six==1.4.1
 wsgiref==0.1.2
+flask-debugtoolbar

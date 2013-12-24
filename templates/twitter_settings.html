@@ -5,19 +5,20 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">
-					Foursquare
+					Twitter
 				</h3>
 			</div>
 			<div class="panel-body">
-				{{render_field(form.client_id)}}
-				{{render_field(form.client_secret)}}
+				{{render_field(form.consumer_key)}}
+				{{render_field(form.consumer_secret)}}
 			</div>
 			<div class="panel-footer">
 				<h4>Instructions</h4>
 				<ol>
-					<li>Visit <a href="https://developer.foursquare.com">developer.foursquare.com</a> and create a new app</li>
-					<li>Enter the 'Client ID' and 'Client Secret' for the app in the boxes above.</li>
-					<li>Click save and authorise Habitat to access your Foursquare data.</li>
+					<li>Visit <a href="https://dev.twitter.com/apps/new">dev.twitter.com</a> and create a new app. Enter any valid url in the 'website' box.</li>
+					<li>Set the 'Callback URL' to the URL of this page</li>
+					<li>Enter the 'Consumer ID' and 'Consumer secret' for the app in the boxes above.</li>
+					<li>Click save and authorise Habitat to access your Twitter data.</li>
 				</ol>
 			</div>
 		</div>

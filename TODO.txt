@@ -1,1 +1,25 @@
-* 
+
+Some point:
+* api details should be hashed
+
+
+
+
+
+Ideas for modules:
+
+	- authenticate/register (form and code)
+	- setting fields
+
+
+Ideas for models:
+	- event (somehting happended)
+	- location
+	- message
+	- register itself with scheduler
+
+
+Missing components:
+	- message que
+	- scheduler
+	- 

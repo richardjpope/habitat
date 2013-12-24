@@ -1,7 +1,7 @@
-from flask import Flask, request, redirect, render_template, json, Response, url_for, flash
+from flask import Flask, request, redirect, render_template, json, Response, url_for, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.mongoengine import MongoEngine
-from mongoengine import connect
+from mongoengine import connect, DoesNotExist
 import jinja2
 import os
 import models
@@ -32,7 +32,6 @@ app.config.update(
     SECRET_KEY = 'fmdnkslr4u8932b3n2',
 )
 
-
 toolbar = DebugToolbarExtension(app)
 db = MongoEngine(app)
 
@@ -57,26 +56,79 @@ def edit():
 def settings():
     return render_template('settings.html')
 
+@app.route("/settings/twitter", methods=['GET', 'POST'])
+def twitter_settings():
+    
+    import tweepy
+
+    form = forms.TwitterForm(request.form)
+    try:
+        setting = models.Setting.objects.get(key='twitter-auth') # add default
+    except DoesNotExist:
+        setting = models.Setting()
+        setting.key = 'twitter-auth'
+        setting.value = {'consumer-key': None, 'consumer-secret':None, 'access-token-key':None, 'access-token-secret':None}
+
+    oauth_token = request.args.get('oauth_token', None)
+    oauth_verifier = request.args.get('oauth_verifier', None)
+    if request.method == 'GET' and oauth_token and oauth_verifier:
+        
+        auth = tweepy.OAuthHandler(str(setting.value['consumer-key']), str(setting.value['consumer-secret']))
+        request_token = session.get('twitter-request-token', None)
+        if request_token:
+            session.pop('twitter-request-token')
+            auth.set_request_token(request_token[0], request_token[1])
+            access_token = auth.get_access_token(oauth_verifier)
+            setting.value['access-token-key'] =  access_token.key
+            setting.value['access-token-secret'] =  access_token.key
+            setting = setting.save()
+            flash('Your Twitter account has been linked', 'success')
+
+    #set initial data
+    if request.method == 'GET' and setting:
+        form.consumer_key.data = setting.value['consumer-key']
+        form.consumer_secret.data = setting.value['consumer-secret']
+
+    #save
+    if request.method == 'POST' and form.validate():
+        if not setting:
+            setting = models.Setting()
+        setting.key = 'twitter-auth'
+        setting.value = {'consumer-key': form.consumer_key.data, 'consumer-secret': form.consumer_secret.data, 'access-token-key': setting.value['access-token-key'], 'access-token-secret': setting.value['access-token-secret']}
+        setting = setting.save()
+
+        #do oauth thing
+        auth = tweepy.OAuthHandler(str(setting.value['consumer-key']), str(setting.value['consumer-secret']), 'http://127.0.0.1:5000/settings/twitter')
+        redirect_url =  auth.get_authorization_url()
+        session['twitter-request-token'] = (auth.request_token.key, auth.request_token.secret)
+        return redirect(redirect_url)
+
+    return render_template('twitter_settings.html', form=form)
+
 @app.route("/settings/foursquare", methods=['GET', 'POST'])
 def foursquare_settings():
 
     import foursquare
 
     form = forms.FoursquareForm(request.form)
-    setting = models.Setting.objects.get(key='foursquare-auth') # add default
-    access_token = None
+    try:
+        setting = models.Setting.objects.get(key='foursquare-auth') # add default
+    except DoesNotExist:
+        setting = models.Setting()
+        setting.key = 'foursquare-auth'
+        setting.value = {'client-id': None, 'client-secret':None, 'access-token':None}
 
     #check for auth code from foursquare
     access_code = request.args.get('code', None)
     if request.method == 'GET' and access_code:
 
         client = foursquare.Foursquare(client_id=setting.value['client-id'], client_secret=setting.value['client-secret'], redirect_uri='http://localhost:5000/settings/foursquare')
-
         access_token = client.oauth.get_token(access_code)
 
-        flash('Your Foursquare account has been linked', 'success')
-        setting.value['access_token'] = access_token
+        setting.value['access-token'] = access_token
         setting.save()
+
+        flash('Your Foursquare account has been linked', 'success')
 
     #set initial data
     if request.method == 'GET' and setting:
@@ -88,12 +140,11 @@ def foursquare_settings():
         if not setting:
             setting = models.Setting()
         setting.key = 'foursquare-auth'
-        setting.value = {'client-id': form.client_id.data, 'client-secret': form.client_secret.data, 'access-token': access_token}
+        setting.value = {'client-id': form.client_id.data, 'client-secret': form.client_secret.data, 'access-token': setting.value['access-token']}
         setting = setting.save()
 
+        #do oauth thing
         client = foursquare.Foursquare(client_id=setting.value['client-id'], client_secret=setting.value['client-secret'], redirect_uri='http://localhost:5000/settings/foursquare')
-
-        #return redirect(url_for('settings'))
         return redirect(client.oauth.auth_url())
 
     return render_template('foursquare_settings.html', form=form, setting=setting)
