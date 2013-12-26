@@ -4,8 +4,6 @@ Some point:
 
 
 
-
-
 Ideas for modules:
 
 	- authenticate/register (form and code)

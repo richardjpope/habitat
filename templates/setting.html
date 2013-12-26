@@ -5,19 +5,20 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">
-					Foursquare
+					{{module_title}}
 				</h3>
 			</div>
 			<div class="panel-body">
-				{{render_field(form.client_id)}}
-				{{render_field(form.client_secret)}}
+				{% for field in form %}
+					{{render_field(field)}}
+				{% endfor %}
 			</div>
 			<div class="panel-footer">
 				<h4>Instructions</h4>
 				<ol>
-					<li>Visit <a href="https://developer.foursquare.com">developer.foursquare.com</a> and create a new app</li>
-					<li>Enter the 'Client ID' and 'Client Secret' for the app in the boxes above.</li>
-					<li>Click save and authorise Habitat to access your Foursquare data.</li>
+					{% for instruction in instructions %}
+						<li>{{instruction|safe}}</li>
+					{% endfor %}
 				</ol>
 			</div>
 		</div>
