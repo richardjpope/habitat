@@ -1,14 +1,14 @@
+Next:
 
 Some point:
 * api details should be hashed
+* display the log file using websockets
 
-
-
+-----------------------------
 Ideas for modules:
 
 	- authenticate/register (form and code)
 	- setting fields
-
 
 Ideas for models:
 	- event (somehting happended)

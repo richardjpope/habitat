@@ -1,8 +1,9 @@
 from wtforms import Form, TextField, validators
 import tweepy as twitter_api
 from mongoengine import DoesNotExist
-from flask import request, redirect, flash, session, render_template
+from flask import request, redirect, flash, session, render_template, current_app
 import models
+import app
 
 class Twitter():
 
@@ -11,7 +12,6 @@ class Twitter():
         consumer_secret = TextField('Consumer secret', [validators.Required()])        
 
     def settings_view(self, request):
-
         form = Twitter.SettingsForm(request.form)
         try:
             setting = models.Setting.objects.get(key='twitter-auth') # add default
@@ -33,7 +33,12 @@ class Twitter():
                 setting.value['access-token-key'] =  access_token.key
                 setting.value['access-token-secret'] =  access_token.key
                 setting = setting.save()
-                flash('Your Twitter account has been linked', 'success')
+
+                #get the username for authenticated account (mainly for logging purposes)
+                client = twitter_api.API(auth)
+                screen_name = client.me().screen_name
+                flash('The twitter account for %s has been added to Habitat' % screen_name, 'success')
+                current_app.logger.info('Authorised Twitter account %s ' % screen_name)
 
         #set initial data
         if request.method == 'GET' and setting:
@@ -58,3 +63,13 @@ class Twitter():
         instructions = ['Visit <a href="https://dev.twitter.com/apps/new">dev.twitter.com</a> and create a new app. Enter any valid url in the \'website\' box.', 'Set the \'Callback URL\' to the URL of this page', 'Enter the \'Consumer ID\' and \'Consumer secret\' for the app in the boxes above', 'Click save and authorise Habitat to access your Twitter data.']
 
         return render_template('setting.html', form=form, setting=setting, instructions=instructions, module_title="Twitter")
+
+    def get_data(self):
+
+        #grab all data
+
+        #look for locaitons
+
+        #update the locations model
+
+        pass

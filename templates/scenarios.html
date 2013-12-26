@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+    {% for scenario in scenarios %}
+        <div class="scenario">
+        	<div class="code">
+        		<div class="raw">
+{{scenario['contents']}}
+				</div>
+			</div>
+			<div class="meta">
+				<a href="#" class="btn btn-default">Edit</a>
+				Last modified: {{scenario['modified_at']}}
+			</div>
+        </div>
+    {% endfor %}
+    <script type="text/javascript">
+    $('.scenario .code .raw').each(function( index ) {
+         var myCodeMirror = CodeMirror(this.parentNode, {
+        	value: this.innerHTML,
+        	readOnly: 'nocursor'
+    	});
+
+    });
+    $('.scenario .code .raw').each(function( index ) {
+        this.remove();
+    });
+    </script>
+{% endblock %}

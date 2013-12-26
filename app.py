@@ -2,6 +2,7 @@ from flask import Flask, request, redirect, render_template, json, Response, url
 from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.mongoengine import MongoEngine
 from mongoengine import connect, DoesNotExist
+import datetime
 import jinja2
 import os
 import models
@@ -9,11 +10,21 @@ import forms
 import re
 import os
 import glob
+import logging
+from logging.handlers import RotatingFileHandler
 
 # settings
 MONGO_URL = os.environ.get("MONGOHQ_URL")
 app = Flask(__name__)
 
+#logging
+file_handler = logging.handlers.RotatingFileHandler('habitat.log', maxBytes=1024 * 1024 * 100, backupCount=20)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(logging.Formatter('%(asctime)s, %(levelname)s, %(message)s'))
+app.logger.setLevel(logging.INFO)
+app.logger.addHandler(file_handler)
+
+#database
 if MONGO_URL:
     credentials = re.sub(r"(.*?)//(.*?)(@hatch)", r"\2",MONGO_URL)
     username = credentials.split(":")[0]
@@ -35,20 +46,26 @@ app.config.update(
 toolbar = DebugToolbarExtension(app)
 db = MongoEngine(app)
 
+# @app.route("/")
+# def index():
+#     return render_template('index.html')
+
 @app.route("/")
-def index():
+def scenarios():
     scenarios = []
     from behave import parser
     root_dir = os.path.dirname(os.path.abspath(__file__))
     scenarios_dir = os.path.join(root_dir, 'scenarios')
     for file_name in glob.glob(scenarios_dir + '/*.feature'):
-        # file_ref = open(file_name)
-        # scenarios.append(file_ref.read())
-        print parser.parse_file(file_name).scenarios[0].steps
+        file_ref = open(file_name)
+        contents = file_ref.read()
+        modified_at = datetime.datetime.fromtimestamp(os.path.getmtime(file_name))
+        scenarios.append({'contents': contents, 'modified_at': modified_at})
         #scenarios.append(parser.parse_file(file_name).scenarios[0])
-    return render_template('index.html', scenarios=scenarios)
 
-@app.route("/edit")
+    return render_template('scenarios.html', scenarios=scenarios)
+
+@app.route("/scenarios/edit")
 def edit():
     return render_template('edit.html')
 
@@ -58,7 +75,7 @@ def settings():
 
 @app.route("/settings/twitter", methods=['GET', 'POST'])
 def twitter_settings():
-   
+    
     from modules.twitter import Twitter
     twitter = Twitter()
     return twitter.settings_view(request)
