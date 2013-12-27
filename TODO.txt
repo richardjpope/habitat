@@ -1,8 +1,10 @@
 Next:
 
 Some point:
+
 * api details should be hashed
 * display the log file using websockets
+* use js installer for bootstrap/codemirror/jquery
 
 -----------------------------
 Ideas for modules:
@@ -20,4 +22,3 @@ Ideas for models:
 Missing components:
 	- message que
 	- scheduler
-	- 

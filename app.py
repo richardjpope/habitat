@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, json, Response, url_for, flash, session
+from flask import Flask, request, redirect, render_template, json, Response, url_for, flash, session, abort
 from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.mongoengine import MongoEngine
 from mongoengine import connect, DoesNotExist
@@ -53,21 +53,30 @@ db = MongoEngine(app)
 @app.route("/")
 def scenarios():
     scenarios = []
-    from behave import parser
+    #from behave import parser
     root_dir = os.path.dirname(os.path.abspath(__file__))
     scenarios_dir = os.path.join(root_dir, 'scenarios')
     for file_name in glob.glob(scenarios_dir + '/*.feature'):
+        print file_name
         file_ref = open(file_name)
         contents = file_ref.read()
+        scenario_id = os.path.basename(file_name).split('.')[0]
         modified_at = datetime.datetime.fromtimestamp(os.path.getmtime(file_name))
-        scenarios.append({'contents': contents, 'modified_at': modified_at})
+        scenarios.append({'contents': contents, 'modified_at': modified_at, 'scenario_id': scenario_id})
         #scenarios.append(parser.parse_file(file_name).scenarios[0])
 
     return render_template('scenarios.html', scenarios=scenarios)
 
-@app.route("/scenarios/edit")
-def edit():
-    return render_template('edit.html')
+@app.route("/scenarios/edit/<scenario_id>")
+def edit(scenario_id):
+    scenario_id = scenario_id.replace('.', '').replace('/', '') #make safe(er) to stop ../../
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(root_dir, 'scenarios', scenario_id) + '.feature'
+    print file_path
+    if os.path.isfile(file_path):
+        return render_template('edit.html')
+    else:
+        abort(404)
 
 @app.route("/settings")
 def settings():
