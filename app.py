@@ -2,7 +2,7 @@ from flask import Flask, request, redirect, render_template, json, Response, url
 from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.mongoengine import MongoEngine
 from mongoengine import connect, DoesNotExist
-import datetime
+from datetime import datetime
 import jinja2
 import os
 import models
@@ -11,7 +11,10 @@ import re
 import os
 import glob
 import logging
+import uuid
 from logging.handlers import RotatingFileHandler
+from behave import parser as behave_parser
+from behave import model as behave_models
 
 # settings
 SCENARIO_DIR = 'testing'
@@ -38,59 +41,90 @@ if MONGO_URL:
         username=username,
         password=password
     )
+
 app.config.update(
     DEBUG = True,
     MONGODB_SETTINGS = {'DB': "openactivity"},
     SECRET_KEY = 'fmdnkslr4u8932b3n2',
-    SCENARIO_DIR = 'scenarios'
 )
+
+app.config['FEATURE_DIR'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scenarios')
 
 toolbar = DebugToolbarExtension(app)
 db = MongoEngine(app)
 
-# @app.route("/")
-# def index():
-#     return render_template('index.html')
+def make_id_safe(scenario_id):
+    return scenario_id.replace('.', '').replace('/', '') #make safe(er) to stop ../../        
+
+def generate_file_name(feature):
+    from slugify import slugify
+    file_name = slugify(feature.name)
+    file_name_test = file_name
+    is_unique = False
+    count = 0
+    while not is_unique:
+        if not os.path.isfile(os.path.join(app.config['FEATURE_DIR'], file_name_test + '.feature')):
+            is_unique = True
+        else:
+            count = count + 1
+            file_name_test = "%s-%s" % (file_name, str(count))
+
+    return file_name_test
+
+def get_feature_file_name(feature_id):
+    feature_id = make_id_safe(feature_id)
+    return os.path.join(app.config['FEATURE_DIR'], feature_id + '.feature')
+
+def feature_to_string(feature):
+    result = "%s: %s \n" % (feature.keyword, feature.name)
+    for scenario in feature:
+        result = "%s    %s: %s \n" % (result, scenario.keyword, scenario.name)
+        for step in scenario.steps:
+            result = "%s        %s %s \n" % (result, step.keyword, step.name)
+    return result
+
+def feature_template():
+    return u'Feature:\n Scenario:\n Given X\n When Y\n Then Z\n'
 
 @app.route("/")
 def scenarios():
-    scenarios = []
-    #from behave import parser
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    scenarios_dir = os.path.join(root_dir, app.config['SCENARIO_DIR'])
-    for file_name in glob.glob(scenarios_dir + '/*.feature'):
-        file_ref = open(file_name)
-        contents = file_ref.read()
-        scenario_id = os.path.basename(file_name).split('.')[0]
-        modified_at = datetime.datetime.fromtimestamp(os.path.getmtime(file_name))
-        scenarios.append({'contents': contents, 'modified_at': modified_at, 'scenario_id': scenario_id})
-        #scenarios.append(parser.parse_file(file_name).scenarios[0])
+    features = []
+    for feature_file_path in glob.glob(app.config['FEATURE_DIR'] + '/*.feature'):
 
-    return render_template('scenarios.html', scenarios=scenarios)
+        feature = behave_parser.parse_file(feature_file_path)
+        feature_id = os.path.basename(feature_file_path).split('.')[0]
+        modified_at = datetime.fromtimestamp(os.path.getmtime(feature_file_path))
 
-@app.route("/scenarios/edit/<scenario_id>", methods=['GET', 'POST'])
+        features.append({'code': feature_to_string(feature), 'modified_at': modified_at, 'feature_id': feature_id})
+
+    return render_template('scenarios.html', features=features)
+
+@app.route("/scenarios/<scenario_id>", methods=['GET', 'POST'])
 def edit(scenario_id):
+
     form = forms.ScenarioForm(request.form)
+    if request.method == 'GET':
+        if scenario_id != 'new':
+            feature_file_path = get_feature_file_name(scenario_id)
+            feature = behave_parser.parse_file(feature_file_path)
+            form.code.data = feature_to_string(feature)
+        else:
+            form.code.data = ''
 
-    scenario_id = scenario_id.replace('.', '').replace('/', '') #make safe(er) to stop ../../
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(root_dir, app.config['SCENARIO_DIR'], scenario_id) + '.feature'
-    if os.path.isfile(file_path):
-        file_ref = open(file_path, 'r')
-        contents = file_ref.read()
-        scenario = {'contents': contents, 'modified_at': None, 'scenario_id': scenario_id}
+    if request.method == 'POST' and form.validate():
+        
+        feature = behave_parser.parse_feature(form.code.data)
 
-        if request.method == 'POST' and form.validate():
-            file_ref = open(file_path, 'w')
-            file_ref.write(form.feature.data)
-            return redirect(url_for('scenarios'))
+        feature_file_path = get_feature_file_name(scenario_id)
+        if scenario_id == 'new':
+            #feature_file_path = get_feature_file_name(str(uuid.uuid1()))
+            feature_file_path = get_feature_file_name(generate_file_name(feature))
 
-        if request.method == 'GET':
-            form.feature.data = scenario['contents']
+        file_ref = open(feature_file_path, 'w')
+        file_ref.write(feature_to_string(feature))
+        return redirect(url_for('scenarios'))
 
-        return render_template('edit.html', scenario=scenario, form=form)
-    else:
-        abort(404)
+    return render_template('edit.html', form=form)
 
 @app.route("/settings")
 def settings():

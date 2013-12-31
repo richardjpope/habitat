@@ -1,9 +1,10 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block content %}
 <form action="" method="post">
 	<div class="scenario edit">
         	<div class="code">
-{{form.feature}}
+{{form.code}}
 			</div>
 	</div>
 	<a href="{{url_for('scenarios')}}" class="btn btn-default">&larr; Cancel</a>
@@ -12,7 +13,7 @@
 
 
 	<script type="text/javascript">
-	 	var myCodeMirror = CodeMirror.fromTextArea($('#feature')[0]);
+	 	var myCodeMirror = CodeMirror.fromTextArea($('#code')[0]);
 	 	myCodeMirror.focus()
 	</script>
 </form>

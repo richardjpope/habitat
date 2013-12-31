@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="scenarios">
-        {% for scenario in scenarios %}
+        {% for feature in features %}
             <div class="scenario">
             	<div class="code">
             		<div class="raw">
-    {{scenario['contents']}}
+{{feature['code']}}
     				</div>
     			</div>
     			<div class="meta">
-    				<a href="{{url_for('edit', scenario_id=scenario['scenario_id'])}}" class="btn btn-default">Edit</a>
-    				Last modified: {{scenario['modified_at']}}
+    				<a href="{{url_for('edit', scenario_id=feature['feature_id'])}}" class="btn btn-default">Edit</a>
+    				Last modified: {{feature['modified_at']}}
     			</div>
             </div>
         {% endfor %}

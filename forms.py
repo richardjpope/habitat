@@ -2,9 +2,9 @@ from wtforms import Form, BooleanField, TextField, RadioField, HiddenField, Text
 from behave.parser import parse_feature, ParserError
 
 class ScenarioForm(Form):
-    feature = TextAreaField('Feature', [validators.Required()])
+    code = TextAreaField('Code', [validators.Required()])
 
-    def validate_feature(form, field):
+    def validate_code(form, field):
 		try:
 			parse_feature(field.data)
 		except ParserError:
