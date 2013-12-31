@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <form action="" method="post">
+	<div class="scenario edit">
+        	<div class="code">
 {{form.feature}}
+			</div>
+	</div>
 	<a href="{{url_for('scenarios')}}" class="btn btn-default">&larr; Cancel</a>
 
 	<button type="submit" class="btn btn-primary">Save</button>
@@ -9,6 +13,7 @@
 
 	<script type="text/javascript">
 	 	var myCodeMirror = CodeMirror.fromTextArea($('#feature')[0]);
+	 	myCodeMirror.focus()
 	</script>
 </form>
 
