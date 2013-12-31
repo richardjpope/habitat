@@ -14,6 +14,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 # settings
+SCENARIO_DIR = 'testing'
 MONGO_URL = os.environ.get("MONGOHQ_URL")
 app = Flask(__name__)
 
@@ -41,6 +42,7 @@ app.config.update(
     DEBUG = True,
     MONGODB_SETTINGS = {'DB': "openactivity"},
     SECRET_KEY = 'fmdnkslr4u8932b3n2',
+    SCENARIO_DIR = 'scenarios'
 )
 
 toolbar = DebugToolbarExtension(app)
@@ -55,9 +57,8 @@ def scenarios():
     scenarios = []
     #from behave import parser
     root_dir = os.path.dirname(os.path.abspath(__file__))
-    scenarios_dir = os.path.join(root_dir, 'scenarios')
+    scenarios_dir = os.path.join(root_dir, app.config['SCENARIO_DIR'])
     for file_name in glob.glob(scenarios_dir + '/*.feature'):
-        print file_name
         file_ref = open(file_name)
         contents = file_ref.read()
         scenario_id = os.path.basename(file_name).split('.')[0]
@@ -67,14 +68,27 @@ def scenarios():
 
     return render_template('scenarios.html', scenarios=scenarios)
 
-@app.route("/scenarios/edit/<scenario_id>")
+@app.route("/scenarios/edit/<scenario_id>", methods=['GET', 'POST'])
 def edit(scenario_id):
+    form = forms.ScenarioForm(request.form)
+
     scenario_id = scenario_id.replace('.', '').replace('/', '') #make safe(er) to stop ../../
     root_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(root_dir, 'scenarios', scenario_id) + '.feature'
-    print file_path
+    file_path = os.path.join(root_dir, app.config['SCENARIO_DIR'], scenario_id) + '.feature'
     if os.path.isfile(file_path):
-        return render_template('edit.html')
+        file_ref = open(file_path, 'r')
+        contents = file_ref.read()
+        scenario = {'contents': contents, 'modified_at': None, 'scenario_id': scenario_id}
+
+        if request.method == 'POST' and form.validate():
+            file_ref = open(file_path, 'w')
+            file_ref.write(form.feature.data)
+            return redirect(url_for('scenarios'))
+
+        if request.method == 'GET':
+            form.feature.data = scenario['contents']
+
+        return render_template('edit.html', scenario=scenario, form=form)
     else:
         abort(404)
 

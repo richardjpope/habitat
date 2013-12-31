@@ -39,7 +39,7 @@
 
       <!-- Begin page content -->
       {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
+        {% if messages or form and form.errors %}
           <div class="container">
             {% for category, message in messages %}
               <div class="alert alert-{{category}} alert-dismissable">
@@ -47,6 +47,17 @@
                 {{ message }}
               </div>
             {% endfor %}
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                    {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+                        {% for error in field_errors %}
+                            <li>{{ form[field_name].label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
           </div>
         {% endif %}
     {% endwith %}
