@@ -35,3 +35,12 @@ $ python app.py
 ## Importing OSM data
 
 * Download shape files from http://download.geofabrik.de
+
+
+
+##Running the app
+
+$ source bin/activate
+$ mongod
+$ celery -A app.celery worker -l info
+$ python app.py

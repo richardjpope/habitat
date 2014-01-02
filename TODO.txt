@@ -1,12 +1,14 @@
 Next:
-	* scenario class / wrapper
+
 
 Some point:
 
+* when saving, check for existance of functions referenced by the test
 * api details should be hashed
 * display the log file using websockets
 
 Done:
+
 * use bower installer for bootstrap/codemirror/jquery
 
 -----------------------------
@@ -24,5 +26,3 @@ Ideas for models:
 Missing components:
 	- message que
 	- scheduler
-
-

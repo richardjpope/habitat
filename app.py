@@ -6,20 +6,35 @@ from datetime import datetime
 import jinja2
 import os
 import models
+import tasks
 import forms
 import re
 import os
 import glob
 import logging
 import uuid
+from utils import tasks as task_utils
 from logging.handlers import RotatingFileHandler
 from behave import parser as behave_parser
 from behave import model as behave_models
 
 # settings
 SCENARIO_DIR = 'testing'
-MONGO_URL = os.environ.get("MONGOHQ_URL")
 app = Flask(__name__)
+app.config.from_pyfile('config.py')
+
+# app.config.update(
+#     DEBUG = True,
+#     MONGODB_SETTINGS = {'DB': "openactivity"},
+#     SECRET_KEY = 'fmdnkslr4u8932b3n2',
+#     CELERY_BROKER_URL='mongodb://localhost:27017/openactivity-tasks',
+#     CELERY_RESULT_BACKEND='mongodb://localhost:27017/openactivity-tasks',
+#     CELERY_TIMEZONE = 'Europe/London',
+# )
+# app.config['FEATURE_DIR'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scenarios')
+
+db = MongoEngine(app)   
+celery = task_utils.make_celery(app)
 
 #logging
 file_handler = logging.handlers.RotatingFileHandler('habitat.log', maxBytes=1024 * 1024 * 100, backupCount=20)
@@ -28,33 +43,11 @@ file_handler.setFormatter(logging.Formatter('%(asctime)s, %(levelname)s, %(messa
 app.logger.setLevel(logging.INFO)
 app.logger.addHandler(file_handler)
 
-#database
-if MONGO_URL:
-    credentials = re.sub(r"(.*?)//(.*?)(@hatch)", r"\2",MONGO_URL)
-    username = credentials.split(":")[0]
-    password = credentials.split(":")[1]
-    app.config["MONGODB_DB"] = MONGO_URL.split("/")[-1]
-    connect(
-        MONGO_URL.split("/")[-1],
-        host=MONGO_URL,
-        port=1043,
-        username=username,
-        password=password
-    )
+#toolbar = DebugToolbarExtension(app)
 
-app.config.update(
-    DEBUG = True,
-    MONGODB_SETTINGS = {'DB': "openactivity"},
-    SECRET_KEY = 'fmdnkslr4u8932b3n2',
-)
-
-app.config['FEATURE_DIR'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scenarios')
-
-toolbar = DebugToolbarExtension(app)
-db = MongoEngine(app)
-
-def make_id_safe(scenario_id):
-    return scenario_id.replace('.', '').replace('/', '') #make safe(er) to stop ../../        
+@celery.task()
+def add_together(a, b):
+    return a + b
 
 def generate_file_name(feature):
     from slugify import slugify
@@ -72,7 +65,7 @@ def generate_file_name(feature):
     return file_name_test
 
 def get_feature_file_name(feature_id):
-    feature_id = make_id_safe(feature_id)
+    feature_id = feature_id.replace('.', '').replace('/', '') #make safe(er) to stop ../../     
     return os.path.join(app.config['FEATURE_DIR'], feature_id + '.feature')
 
 def feature_to_string(feature):
@@ -88,6 +81,10 @@ def feature_template():
 
 @app.route("/")
 def scenarios():
+
+    result = add_together.delay(23, 45)
+    result.wait()
+
     features = []
     for feature_file_path in glob.glob(app.config['FEATURE_DIR'] + '/*.feature'):
 
