@@ -3,14 +3,18 @@ import foursquare as foursquare_api
 from mongoengine import DoesNotExist
 from flask import request, redirect, flash, session, render_template
 import models
+from sources import SourceBase
 
-class Foursquare():
+class Foursquare(SourceBase):
 
 	class SettingsForm(Form):
 	    client_id = TextField('Client ID', [validators.Required()])
 	    client_secret = TextField('Client secret', [validators.Required()])
 
-	def settings_view(self, request):
+	def fetch_data(self):
+		print "fetching data from foursquare"
+
+	def settings_view(self):
 
 	    form = Foursquare.SettingsForm(request.form)
 	    try:

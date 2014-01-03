@@ -3,15 +3,18 @@ import tweepy as twitter_api
 from mongoengine import DoesNotExist
 from flask import request, redirect, flash, session, render_template, current_app
 import models
-import app
+from sources import SourceBase
 
-class Twitter():
+class Twitter(SourceBase):
 
     class SettingsForm(Form):
         consumer_key = TextField('Consumer key', [validators.Required()])
         consumer_secret = TextField('Consumer secret', [validators.Required()])        
 
-    def settings_view(self, request):
+    def fetch_data(self):
+        print "fetching data from twitter"
+
+    def settings_view(self):
         form = Twitter.SettingsForm(request.form)
         try:
             setting = models.Setting.objects.get(key='twitter-auth') # add default
@@ -63,13 +66,3 @@ class Twitter():
         instructions = ['Visit <a href="https://dev.twitter.com/apps/new">dev.twitter.com</a> and create a new app. Enter any valid url in the \'website\' box.', 'Set the \'Callback URL\' to the URL of this page', 'Enter the \'Consumer ID\' and \'Consumer secret\' for the app in the boxes above', 'Click save and authorise Habitat to access your Twitter data.']
 
         return render_template('setting.html', form=form, setting=setting, instructions=instructions, module_title="Twitter")
-
-    def get_data(self):
-
-        #grab all data
-
-        #look for locaitons
-
-        #update the locations model
-
-        pass

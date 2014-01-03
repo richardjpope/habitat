@@ -3,6 +3,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.mongoengine import MongoEngine
 from mongoengine import connect, DoesNotExist
 from datetime import datetime
+from celery import Celery
 import jinja2
 import os
 import models
@@ -13,41 +14,58 @@ import os
 import glob
 import logging
 import uuid
-from utils import tasks as task_utils
 from logging.handlers import RotatingFileHandler
 from behave import parser as behave_parser
 from behave import model as behave_models
+from celery.decorators import task
 
-# settings
-SCENARIO_DIR = 'testing'
-app = Flask(__name__)
-app.config.from_pyfile('config.py')
+# from flask_anything.some_module import Anything
 
-# app.config.update(
-#     DEBUG = True,
-#     MONGODB_SETTINGS = {'DB': "openactivity"},
-#     SECRET_KEY = 'fmdnkslr4u8932b3n2',
-#     CELERY_BROKER_URL='mongodb://localhost:27017/openactivity-tasks',
-#     CELERY_RESULT_BACKEND='mongodb://localhost:27017/openactivity-tasks',
-#     CELERY_TIMEZONE = 'Europe/London',
-# )
-# app.config['FEATURE_DIR'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scenarios')
+def make_celery(app):
+    celery = Celery('app', broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+    class ContextTask(TaskBase):
+        abstract = True
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+    return celery
 
-db = MongoEngine(app)   
-celery = task_utils.make_celery(app)
+def make_app():
 
-#logging
-file_handler = logging.handlers.RotatingFileHandler('habitat.log', maxBytes=1024 * 1024 * 100, backupCount=20)
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(logging.Formatter('%(asctime)s, %(levelname)s, %(message)s'))
-app.logger.setLevel(logging.INFO)
-app.logger.addHandler(file_handler)
+    app = Flask(__name__)
+    app.config.from_pyfile('config.py')
+    db = MongoEngine(app)
 
-#toolbar = DebugToolbarExtension(app)
+    #logging
+    file_handler = logging.handlers.RotatingFileHandler(app.config['HABITAT_LOG_FILE'], maxBytes=1024 * 1024 * 100, backupCount=20)
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s, %(levelname)s, %(message)s'))
+    app.logger.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
 
-@celery.task()
-def add_together(a, b):
-    return a + b
+    return app    
+
+app = make_app()
+celery = make_celery(app)
+
+from sources.foursquare import Foursquare
+foursquare = Foursquare(app, celery)
+
+from sources.twitter import Twitter
+twitter = Twitter(app, celery)
+
+# Anything(app, celery)
+
+@task()
+def get_data():
+    print "hello!!!!"
+
+# @celery.task()
+# def add_together(a, b):
+#     return a + b
 
 def generate_file_name(feature):
     from slugify import slugify
@@ -76,14 +94,11 @@ def feature_to_string(feature):
             result = "%s        %s %s \n" % (result, step.keyword, step.name)
     return result
 
-def feature_template():
-    return u'Feature:\n Scenario:\n Given X\n When Y\n Then Z\n'
-
 @app.route("/")
 def scenarios():
 
-    result = add_together.delay(23, 45)
-    result.wait()
+    # result = add_together.delay(23, 45)
+    # result.wait()
 
     features = []
     for feature_file_path in glob.glob(app.config['FEATURE_DIR'] + '/*.feature'):
@@ -127,32 +142,25 @@ def edit(scenario_id):
 def settings():
     return render_template('settings.html')
 
-@app.route("/settings/twitter", methods=['GET', 'POST'])
-def twitter_settings():
-    
-    from modules.twitter import Twitter
-    twitter = Twitter()
-    return twitter.settings_view(request)
+# @app.route("/settings/foursquare", methods=['GET', 'POST'])
+# def foursquare_settings():
+#     from modules.foursquare import Foursquare
+#     foursquare = Foursquare()
+#     return foursquare.settings_view(request)
 
-@app.route("/settings/foursquare", methods=['GET', 'POST'])
-def foursquare_settings():
-    from modules.foursquare import Foursquare
-    foursquare = Foursquare()
-    return foursquare.settings_view(request)
+# @app.route("/api/")
+# def api():
+#     #building: http://localhost:5000/api/?lng=-0.1206612&lat=51.517323
+#     #road: http://localhost:5000/api/?lng=-0.120442&lat=51.517546
+#     #buildings = models.Fence.objects(polygon__geo_intersects=[float(-0.1206612), float(51.517323)], category='building')
+#     buildings = models.Fence.objects(polygon__geo_intersects=[float(request.args.get('lng')), float(request.args.get('lat'))], category='building')
+#     print len(buildings)
+#     data = {
+#         'outside' : len(buildings) == 0
+#     }
 
-@app.route("/api/")
-def api():
-    #building: http://localhost:5000/api/?lng=-0.1206612&lat=51.517323
-    #road: http://localhost:5000/api/?lng=-0.120442&lat=51.517546
-    #buildings = models.Fence.objects(polygon__geo_intersects=[float(-0.1206612), float(51.517323)], category='building')
-    buildings = models.Fence.objects(polygon__geo_intersects=[float(request.args.get('lng')), float(request.args.get('lat'))], category='building')
-    print len(buildings)
-    data = {
-        'outside' : len(buildings) == 0
-    }
-
-    response = Response(json.dumps(data), status=200, mimetype='application/json')
-    return response
+#     response = Response(json.dumps(data), status=200, mimetype='application/json')
+#     return response
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

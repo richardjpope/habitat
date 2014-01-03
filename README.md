@@ -42,5 +42,5 @@ $ python app.py
 
 $ source bin/activate
 $ mongod
-$ celery -A app.celery worker -l info
+$ celery -A app.celery worker -B -l info
 $ python app.py
