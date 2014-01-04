@@ -6,7 +6,7 @@ MarkupSafe==0.18
 WTForms==1.0.4
 Werkzeug==0.9.4
 argparse==1.2.1
-behave==1.2.3
+git+https://github.com/behave/behave.git
 flask-mongoengine==0.7.0
 foursquare==2013.12.10
 geojson==1.0.1

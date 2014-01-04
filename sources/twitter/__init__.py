@@ -14,6 +14,7 @@ class Twitter(SourceBase):
     def fetch_data(self):
         print "fetching data from twitter"
 
+
     def settings_view(self):
         form = Twitter.SettingsForm(request.form)
         try:

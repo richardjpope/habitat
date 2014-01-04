@@ -17,14 +17,12 @@ import uuid
 from logging.handlers import RotatingFileHandler
 from behave import parser as behave_parser
 from behave import model as behave_models
-from celery.decorators import task
-
-# from flask_anything.some_module import Anything
 
 def make_celery(app):
     celery = Celery('app', broker=app.config['CELERY_BROKER_URL'])
     celery.conf.update(app.config)
     TaskBase = celery.Task
+    
     class ContextTask(TaskBase):
         abstract = True
         def __call__(self, *args, **kwargs):
@@ -46,26 +44,18 @@ def make_app():
     app.logger.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
 
-    return app    
+    return app
+
+def make_sources(app, celery):
+    from sources.foursquare import Foursquare
+    Foursquare(app, celery)
+
+    from sources.twitter import Twitter
+    Twitter(app, celery)
 
 app = make_app()
 celery = make_celery(app)
-
-from sources.foursquare import Foursquare
-foursquare = Foursquare(app, celery)
-
-from sources.twitter import Twitter
-twitter = Twitter(app, celery)
-
-# Anything(app, celery)
-
-@task()
-def get_data():
-    print "hello!!!!"
-
-# @celery.task()
-# def add_together(a, b):
-#     return a + b
+make_sources(app, celery)
 
 def generate_file_name(feature):
     from slugify import slugify
@@ -93,6 +83,43 @@ def feature_to_string(feature):
         for step in scenario.steps:
             result = "%s        %s %s \n" % (result, step.keyword, step.name)
     return result
+
+@celery.task
+def run_scenarios():
+
+    from behave.configuration import Configuration, ConfigError
+    from behave.runner import Runner
+    from behave.runner_util import InvalidFileLocationError, InvalidFilenameError, FileNotFoundError
+    from behave.parser import ParserError
+
+    failed = True
+    configuration = Configuration(command_args='') # important: without this, the sys.args from celery worker confuse it
+    configuration.paths = [app.config['FEATURE_DIR']]
+    configuration.format = ['pretty']
+    configuration.verbose = True
+
+    app.logger.info('Running scenarios')
+    runner = Runner(configuration)
+
+    try:
+        failed = runner.run()
+    except ParserError, e:
+        return "ParseError: %s" % e
+    except ConfigError, e:
+        return "ConfigError: %s" % e
+    except FileNotFoundError, e:
+        return "FileNotFoundError: %s" % e
+    except InvalidFileLocationError, e:
+        return "InvalidFileLocationError: %s" % e
+    except InvalidFilenameError, e:
+        return "InvalidFilenameError: %s" % e
+
+    return 'worked'
+
+@app.route("/run")
+def run_scenarios_view():
+
+    return run_scenarios()
 
 @app.route("/")
 def scenarios():
@@ -129,7 +156,6 @@ def edit(scenario_id):
 
         feature_file_path = get_feature_file_name(scenario_id)
         if scenario_id == 'new':
-            #feature_file_path = get_feature_file_name(str(uuid.uuid1()))
             feature_file_path = get_feature_file_name(generate_file_name(feature))
 
         file_ref = open(feature_file_path, 'w')
@@ -141,12 +167,6 @@ def edit(scenario_id):
 @app.route("/settings")
 def settings():
     return render_template('settings.html')
-
-# @app.route("/settings/foursquare", methods=['GET', 'POST'])
-# def foursquare_settings():
-#     from modules.foursquare import Foursquare
-#     foursquare = Foursquare()
-#     return foursquare.settings_view(request)
 
 # @app.route("/api/")
 # def api():

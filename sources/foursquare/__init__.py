@@ -1,7 +1,7 @@
 from wtforms import Form, TextField, validators
 import foursquare as foursquare_api
 from mongoengine import DoesNotExist
-from flask import request, redirect, flash, session, render_template
+from flask import request, redirect, flash, session, render_template, current_app
 import models
 from sources import SourceBase
 
@@ -12,7 +12,14 @@ class Foursquare(SourceBase):
 	    client_secret = TextField('Client secret', [validators.Required()])
 
 	def fetch_data(self):
+
 		print "fetching data from foursquare"
+		setting = models.Setting.objects.get(key='foursquare-auth')
+		client = foursquare_api.Foursquare(access_token=setting.value['access-token'])
+		#print client.users.checkins()
+
+		from app import run_scenarios
+		run_scenarios.delay()
 
 	def settings_view(self):
 
@@ -23,6 +30,7 @@ class Foursquare(SourceBase):
 	        setting = models.Setting()
 	        setting.key = 'foursquare-auth'
 	        setting.value = {'client-id': None, 'client-secret':None, 'access-token':None}
+	        print client.users.checkins()
 
 	    #check for auth code from foursquare
 	    access_code = request.args.get('code', None)
@@ -35,6 +43,7 @@ class Foursquare(SourceBase):
 	        setting.save()
 
 	        flash('Your Foursquare account has been linked', 'success')
+	        current_app.logger.info('Authorised Foursquare account %s ' % screen_name)
 
 	    #set initial data
 	    if request.method == 'GET' and setting:
