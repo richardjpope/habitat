@@ -4,6 +4,7 @@ from mongoengine import DoesNotExist
 from flask import request, redirect, flash, session, render_template, current_app
 import models
 from sources import SourceBase
+import utils
 
 class Twitter(SourceBase):
 
@@ -11,9 +12,17 @@ class Twitter(SourceBase):
         consumer_key = TextField('Consumer key', [validators.Required()])
         consumer_secret = TextField('Consumer secret', [validators.Required()])        
 
-    def fetch_data(self):
-        print "fetching data from twitter"
+    def register_urls(self, app):
+        app.add_url_rule("/settings/twitter", 'twitter_settings', self.settings_view, methods=['GET', 'POST'])
 
+    def register_tasks(self, celery):
+        celery.task(self.fetch_events)
+
+    def schedule_tasks(self, app):
+        utils.schedule_reccuring_task(app, 'twitter', self.fetch_events.__name__, 60)
+
+    def fetch_events(self):
+        print "fetching data from twitter"
 
     def settings_view(self):
         form = Twitter.SettingsForm(request.form)

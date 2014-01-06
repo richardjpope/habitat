@@ -6,6 +6,7 @@ Some point:
 * when saving, check for existance of functions referenced by the test
 * api details should be hashed
 * display the log file using websockets
+* handle timezones
 
 Done:
 
