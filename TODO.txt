@@ -1,5 +1,5 @@
 Next:
-
+* add exception handing to fetch events and process event
 
 Some point:
 

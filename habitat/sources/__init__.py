@@ -1,10 +1,15 @@
 from flask import abort
 from abc import ABCMeta, abstractmethod
+from habitat import app
+from datetime import timedelta
 
 class SourceBase():
     __metaclass__ = ABCMeta
 
-    fetch_delay_seconds = 60
+    @property
+    @abstractmethod
+    def schedule(self):
+        """A list containing a dictionary of functions to schedule"""
 
     @property
     def name(self):
@@ -14,42 +19,23 @@ class SourceBase():
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-        #add routes
-        self.register_urls(app)
+        #schedule tasks
+        for item in self.schedule:
+            schedule_item = {'%s-%s' % (item['function'], self.name): {
+            'task': 'habitat.sources.%s.%s' % (self.name, item['function']),
+            'schedule': timedelta(seconds=item['seconds'])
+            }}
 
-        #add tasks
-        self.register_tasks(celery)
-
-        self.schedule_tasks(app)
-
-        #schedule fetch data
-        # schedule_item = {'fetch-data-%s' % self.name: {
-        #     'task': 'sources.%s.fetch_data' % self.name,
-        #     'schedule': timedelta(seconds=self.fetch_delay_seconds)
-        # }}
-
-        # app.config['CELERYBEAT_SCHEDULE'].update(schedule_item)
+            app.config['CELERYBEAT_SCHEDULE'].update(schedule_item)
 
     @abstractmethod
-    def settings_view(self):
+    def settings_view():
         """A settings page for handling any settings (or returning a 404)"""
 
     @abstractmethod
-    def register_urls(self, app):
-        """Register any URLs the source requires (e.g. settings)"""
-        #app.add_url_rule("/settings/%s" % self.name, "%s_settings" % self.name, view_func=self.settings_view)
-
-    @abstractmethod
-    def register_tasks(self, celery):
-        """Register any tasks the source requires"""
-        #celery.task(self.fetch_data)
-
-    @abstractmethod
-    def schedule_tasks(self, app):
-        """Schedule any recurring tasks"""
-        #celery.task(self.fetch_data)
-
-    @abstractmethod
-    def fetch_events(self):
+    def fetch_events():
         """Get any data from this source"""
 
+    @abstractmethod
+    def process_event(event):
+        """Process a newly fetched event"""

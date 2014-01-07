@@ -8,7 +8,7 @@ class Event(DynamicDocument):
     data = DictField(required=True)
 
 class Location(DynamicDocument):
-    location = PointField()
+    latlng = PointField()
     occcured_at = DateTimeField()
 
 class Setting(Document):

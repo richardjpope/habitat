@@ -2,38 +2,25 @@ from wtforms import Form, TextField, validators
 import foursquare as foursquare_api
 from mongoengine import DoesNotExist
 from flask import request, redirect, flash, session, render_template, current_app
-import models
-import utils
-from sources import SourceBase
+from habitat import models
+from habitat import utils
+from habitat.sources import SourceBase
 from datetime import datetime
-from celery.task import task
 
-celery = utils.make_celery()
-
-@celery.task
-def process_event(self, event):
-    print "HELLO"
-    print event.id
+from habitat import celery, app
 
 class Foursquare(SourceBase):
+
+    @property
+    def schedule(self):
+        return [{'function': 'fetch_events', 'seconds': 60},]
 
     class SettingsForm(Form):
         client_id = TextField('Client ID', [validators.Required()])
         client_secret = TextField('Client secret', [validators.Required()])
 
-    def register_urls(self, app):
-        #app.add_url_rule("/settings/foursquare", 'foursquare_settings', self.settings_view, methods=['GET', 'POST'])
-        pass
-
-    def register_tasks(self, celery):
-        celery.task(self.fetch_events)
-        #celery.task(process_event)
-
-    def schedule_tasks(self, app):
-        utils.schedule_reccuring_task(app, 'foursquare', self.fetch_events.__name__, 60)
-
-    # @app.route('/test', methods=['GET', 'POST'])
-    def settings_view(self):
+    @app.route('/test', endpoint='foursquare_settings', methods=['GET', 'POST'])
+    def settings_view():
 
         form = Foursquare.SettingsForm(request.form)
         try:
@@ -78,7 +65,8 @@ class Foursquare(SourceBase):
 
         return render_template('setting.html', form=form, setting=setting, instructions=instructions, module_title="Foursquare")
 
-    def fetch_events(self):
+    @celery.task
+    def fetch_events():
 
         print "fetching data from foursquare"
         setting = models.Setting.objects.get(key='foursquare-auth')
@@ -100,6 +88,21 @@ class Foursquare(SourceBase):
 
             # from app import run_scenarios
             # run_scenarios.delay()
-            process_event.delay(event)
+            Foursquare.process_event.delay(event)
+
+    @celery.task
+    def process_event(event):
+
+        location = models.Location
+        location.latlng = [float(event.data['venue']['location']['lat']), float(event.data['venue']['location']['lng'])]
+
+        print location
+
+            #get lat / lng
+
+            # store in location collection
+
+
+
 
 SourceBase.register(Foursquare)
