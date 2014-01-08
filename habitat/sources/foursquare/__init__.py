@@ -1,12 +1,12 @@
 from wtforms import Form, TextField, validators
 import foursquare as foursquare_api
 from mongoengine import DoesNotExist
-from flask import request, redirect, flash, session, render_template, current_app
+from flask import request, redirect, flash, session, render_template
 from habitat import models
+from habitat import tasks
 from habitat import utils
 from habitat.sources import SourceBase
 from datetime import datetime
-
 from habitat import celery, app
 
 class Foursquare(SourceBase):
@@ -42,7 +42,7 @@ class Foursquare(SourceBase):
             setting.save()
 
             flash('Your Foursquare account has been linked', 'success')
-            current_app.logger.info('Authorised Foursquare account')
+            app.logger.info('Authorised Foursquare account')
 
         #set initial data
         if request.method == 'GET' and setting:
@@ -68,10 +68,17 @@ class Foursquare(SourceBase):
     @celery.task
     def fetch_events():
 
-        print "fetching data from foursquare"
         setting = models.Setting.objects.get(key='foursquare-auth')
-        client = foursquare_api.Foursquare(access_token=setting.value['access-token'])
-        checkins = client.users.checkins()
+        try:
+            client = foursquare_api.Foursquare(access_token=setting.value['access-token'])
+            checkins = client.users.checkins()
+            app.logger.info("Fetching data from foursquare")
+        except foursquare_api.NotAuthorized, e:
+            app.logger.error("Failed to access Foursquare - not authorised %s" % e)
+        except foursquare_api.RateLimitExceeded, e:
+            app.logger.error("Failed to access Foursquare - rate limit exceeded")
+        except foursquare_api.FoursquareException, e:
+            app.logger.error("Something went wrong talking to Foursquare %s" % e)
 
         for checkin in checkins['checkins']['items']:
             guid = 'https://foursquare.com/v/%s' % checkin['id']
@@ -79,6 +86,7 @@ class Foursquare(SourceBase):
             try:
                 event = models.Event.objects.get(guid=guid)
             except DoesNotExist:
+
                 event = models.Event()
                 event.guid = guid
                 event.data = checkin
@@ -86,23 +94,22 @@ class Foursquare(SourceBase):
                 event.occured_at = datetime.fromtimestamp(checkin['createdAt'])
                 event.save()
 
-            # from app import run_scenarios
-            # run_scenarios.delay()
-            Foursquare.process_event.delay(event)
+                Foursquare.process_event.delay(event)
 
     @celery.task
     def process_event(event):
 
-        location = models.Location
-        location.latlng = [float(event.data['venue']['location']['lat']), float(event.data['venue']['location']['lng'])]
+        location = models.Location()
+        try:
+            location.latlng = [float(event.data['venue']['location']['lat']), float(event.data['venue']['location']['lng'])]
+            location.event_id = event.id
+        except KeyError:
+            app.logger.error('Failed to exctract lat/lng from Foursquare data - event id: %s' % event.id)
 
-        print location
-
-            #get lat / lng
-
-            # store in location collection
-
-
-
+        # try:
+        location.save()
+        app.logger.info('Saved a location from a Foursquare event')
+        # except:
+        #     app.logger.error('Failed to save a location from Foursquare')
 
 SourceBase.register(Foursquare)

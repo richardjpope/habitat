@@ -39,10 +39,9 @@ $ python app.py
 * Download shape files from http://download.geofabrik.de
 
 
-
 ##Running the app
 
 $ source bin/activate
 $ mongod
-$ celery -A app.celery worker -B -l info
+$ celery -A habitat.celery worker -B -l info
 $ python app.py

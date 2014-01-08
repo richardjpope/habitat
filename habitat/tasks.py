@@ -1,4 +1,5 @@
 from habitat import celery
+from habitat import app
 
 @celery.task
 def run_scenarios():
