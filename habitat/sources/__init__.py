@@ -2,6 +2,7 @@ from flask import abort
 from abc import ABCMeta, abstractmethod
 from habitat import app
 from datetime import timedelta
+from habitat import app
 
 class SourceBase():
     __metaclass__ = ABCMeta
@@ -15,7 +16,7 @@ class SourceBase():
     def name(self):
         return self.__class__.__name__.lower()
 
-    def __init__(self, app, celery, **kwargs):
+    def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
 

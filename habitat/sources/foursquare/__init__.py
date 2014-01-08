@@ -19,7 +19,7 @@ class Foursquare(SourceBase):
         client_id = TextField('Client ID', [validators.Required()])
         client_secret = TextField('Client secret', [validators.Required()])
 
-    @app.route('/test', endpoint='foursquare_settings', methods=['GET', 'POST'])
+    @app.route('/settings/foursquare', endpoint='foursquare_settings', methods=['GET', 'POST'])
     def settings_view():
 
         form = Foursquare.SettingsForm(request.form)
@@ -29,7 +29,6 @@ class Foursquare(SourceBase):
             setting = models.Setting()
             setting.key = 'foursquare-auth'
             setting.value = {'client-id': None, 'client-secret':None, 'access-token':None}
-            print client.users.checkins()
 
         #check for auth code from foursquare
         access_code = request.args.get('code', None)
@@ -74,11 +73,11 @@ class Foursquare(SourceBase):
             checkins = client.users.checkins()
             app.logger.info("Fetching data from foursquare")
         except foursquare_api.NotAuthorized, e:
-            app.logger.error("Failed to access Foursquare - not authorised %s" % e)
+            app.logger.error("Failed to access Foursquare - not authorised: %s" % e)
         except foursquare_api.RateLimitExceeded, e:
-            app.logger.error("Failed to access Foursquare - rate limit exceeded")
+            app.logger.error("Failed to access Foursquare - rate limit exceeded: %s" % s)
         except foursquare_api.FoursquareException, e:
-            app.logger.error("Something went wrong talking to Foursquare %s" % e)
+            app.logger.error("Something went wrong talking to Foursquare %s:" % e)
 
         for checkin in checkins['checkins']['items']:
             guid = 'https://foursquare.com/v/%s' % checkin['id']
@@ -103,13 +102,14 @@ class Foursquare(SourceBase):
         try:
             location.latlng = [float(event.data['venue']['location']['lat']), float(event.data['venue']['location']['lng'])]
             location.event_id = event.id
+            location.occcured_at = event.occcured_at
         except KeyError:
             app.logger.error('Failed to exctract lat/lng from Foursquare data - event id: %s' % event.id)
 
-        # try:
-        location.save()
-        app.logger.info('Saved a location from a Foursquare event')
-        # except:
-        #     app.logger.error('Failed to save a location from Foursquare')
+        try:
+            location.save()
+            app.logger.info('Saved a location from a Foursquare event')
+        except:
+            app.logger.error('Failed to save a location from Foursquare')
 
 SourceBase.register(Foursquare)

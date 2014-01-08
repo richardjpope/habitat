@@ -1,5 +1,6 @@
 from mongoengine import StringField, PolygonField, DateTimeField, PointField, StringField, DictField, DynamicDocument, Document, ObjectIdField
 from mongoengine import signals
+from mongoengine import DoesNotExist
 import datetime
 from habitat import tasks
 
@@ -8,6 +9,14 @@ class Event(DynamicDocument):
     source = StringField(max_length=25, required=True) 
     occcured_at = DateTimeField()
     data = DictField(required=True)
+
+    @staticmethod
+    def guid_exists(guid):
+        try:
+            event = Event.objects.get(guid=guid)
+            return True
+        except DoesNotExist:
+            return False
 
 class Location(DynamicDocument):
     latlng = PointField()
@@ -25,6 +34,5 @@ class Setting(Document):
 class Fence(DynamicDocument):
     category = StringField(max_length=25, required=True)
     polygon = PolygonField()
-
-    
+  
 signals.post_save.connect(Location.post_save, sender=Location)

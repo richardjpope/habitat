@@ -35,7 +35,7 @@ import habitat.views
 import tasks
 
 from sources.foursquare import Foursquare
-Foursquare(app, celery)
+Foursquare()
 
-# from sources.twitter import Twitter
-# Twitter(app, celery)
+from sources.twitter import Twitter
+Twitter()
