@@ -4,6 +4,8 @@ from flask.ext.mongoengine import MongoEngine
 import logging
 from celery import Celery
 import utils
+import os
+from habitat import app
 
 def make_celery():
 

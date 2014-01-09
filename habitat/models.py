@@ -7,7 +7,7 @@ from habitat import tasks
 class Event(DynamicDocument):
     guid = StringField(max_length=255, required=True, unique=True)
     source = StringField(max_length=25, required=True) 
-    occcured_at = DateTimeField()
+    occured_at = DateTimeField()
     data = DictField(required=True)
 
     @staticmethod
@@ -21,7 +21,7 @@ class Event(DynamicDocument):
 class Location(DynamicDocument):
     latlng = PointField()
     event_id = ObjectIdField
-    occcured_at = DateTimeField()
+    occured_at = DateTimeField()
 
     @classmethod
     def post_save(cls, sender, document, **kwargs):

@@ -3,7 +3,6 @@
 ##Requirements:
 - Python
 - MongoDB
-- Rabit MQ
 
 
 ##Setup
@@ -45,3 +44,15 @@ $ source bin/activate
 $ mongod
 $ celery -A habitat.celery worker -B -l info
 $ python app.py
+
+
+
+##Setting up Raspberry Pi
+
+* Setup headless server with Raspbarian: http://www.penguintutor.com/linux/raspberrypi-headless
+
+* Get the code
+
+$ git clone https://github.com/memespring/habitat.git ~/habitat
+
+

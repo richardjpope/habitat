@@ -1,16 +1,17 @@
 Next:
-* add exception handing to fetch events and process event
+
 
 Some point:
 
-* when saving, check for existance of functions referenced by the test
-* api details should be hashed
+* when saving, check for existance of functions referenced by the test?
+* move source settings to dedicated collection wuth api details hashed
 * display the log file using websockets
 * handle timezones
 
 Done:
 
 * use bower installer for bootstrap/codemirror/jquery
+* add exception handing to fetch events and process event
 
 -----------------------------
 Ideas for modules:

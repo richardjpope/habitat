@@ -102,7 +102,7 @@ class Foursquare(SourceBase):
         try:
             location.latlng = [float(event.data['venue']['location']['lat']), float(event.data['venue']['location']['lng'])]
             location.event_id = event.id
-            location.occcured_at = event.occcured_at
+            location.occured_at = event.occured_at
         except KeyError:
             app.logger.error('Failed to exctract lat/lng from Foursquare data - event id: %s' % event.id)
 

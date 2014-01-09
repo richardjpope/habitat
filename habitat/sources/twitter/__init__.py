@@ -115,7 +115,7 @@ class Twitter(SourceBase):
             try:
                 location.latlng = event.data['coordinates']['coordinates']
                 location.event_id = event.id
-                location.occcured_at = event.occcured_at
+                location.occured_at = event.occured_at
             except KeyError:
                 app.logger.error('Failed to find expected lat/lng from Twitter data - event id: %s' % event.id)
             try:
