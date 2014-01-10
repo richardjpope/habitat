@@ -13,54 +13,53 @@ Feature: Near a point in space
 
 ##Setting up a fresh Raspberry Pi with Habitat
 
-* Setup headless server with Raspbarian: http://www.penguintutor.com/linux/raspberrypi-headless
+1.  Setup headless server with Raspbarian: http://www.penguintutor.com/linux/raspberrypi-headless
 
-* ssh into the server
+2. ssh into the server
 
-```
-ssh pi@192.168.1.XX
-```
+    ```
+    ssh pi@192.168.1.XX
+    ```
     
+3. Install and configure mongodb (based on https://github.com/RickP/mongopi). 
 
-* Install and configure mongodb (based on https://github.com/RickP/mongopi). 
+    This will take **a very long time to compile**, so it is best to leave this step running over night and use the `screen` command incase your connection to the raspberry pi drops during the process.
 
-This will take **a very long time to compile**, so it is best to leave this step running over night and use the `screen` command incase your connection to the raspberry pi drops during the process.
+    ```
+    screen
+    cd ~
+    sudo apt-get install git-core build-essential scons libpcre++-dev xulrunner-dev libboost-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev
+    git clone git://github.com/RickP/mongopi.git
+    cd mongopi
+    scons
+    sudo scons --prefix=/opt/mongo install
+    ```
 
-```
-screen
-cd ~
-sudo apt-get install git-core build-essential scons libpcre++-dev xulrunner-dev libboost-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev
-git clone git://github.com/RickP/mongopi.git
-cd mongopi
-scons
-sudo scons --prefix=/opt/mongo install
-```
+4. Install PIP package manager for python
 
-* Install PIP package manager for python
+    ```
+    cd ~
+    wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+    sudo python get-pip.py
+    rm get-pip.py
+    sudo pip install setuptools --no-use-wheel --upgrade
+    ```
 
-```
-cd ~
-wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py
-sudo python get-pip.py
-rm get-pip.py
-sudo pip install setuptools --no-use-wheel --upgrade
-```
+5. Get the code
 
-* Get the code
+    ```
+    wget 'https://github.com/memespring/habitat/archive/master.zip'
+    unzip master.zip
+    mv habitat-master habitat
+    rm master.zip
+    ```
 
-```
-wget 'https://github.com/memespring/habitat/archive/master.zip'
-unzip master.zip
-mv habitat-master habitat
-rm master.zip
-```
+6. Install requirements
 
-* Install requirements
-
-```
-cd ~/habitat
-sudo pip install -r habitat/requirements.txt
-```
+    ```
+    cd ~/habitat
+    sudo pip install -r habitat/requirements.txt
+    ```
 
 **TODO: document how to start everything running**
 
@@ -77,47 +76,49 @@ You will need to have the following already setup on your laptop:
 
 ###Setup
 
-* Make a directory and create a virtual environment
+1. Make a directory and create a virtual environment
 
-``` 
-mkdir habitat
-cd habitat
-virtualenv .
-```
-* Grab the code
+    ``` 
+    mkdir habitat
+    cd habitat
+    virtualenv .
+    ```
 
-```
-git clone https://github.com/memespring/habitat.git
-```
+2. Grab the code
 
-* Enter virtual environment and install requirements
+    ```
+    git clone https://github.com/memespring/habitat.git
+    ```
 
-```
-source bin/activate
-pip install -r requirements.txt
-```
+3. Enter virtual environment and install requirements
+
+    ```
+    source bin/activate
+    pip install -r requirements.txt
+    ```
 
 ### Running
 
-* Start Mongo DB (if it isnt already running):
+1. Start Mongo DB (if it isnt already running):
 
-```
-mongod
-```
+    ```
+    mongod
+    ```
 
-* Enter virtual environment:
+2. Enter virtual environment:
 
-```
-source bin/activate
-```
-* Start celery worker 
+    ```
+    source bin/activate
+    ```
 
-```
-celery -A habitat.celery worker -B -l info
-```
+3. Start celery worker 
 
-* Start app
+    ```
+    celery -A habitat.celery worker -B -l info
+    ```
 
-```
-python runserver.py
-```
+4. Start app
+
+    ```
+    python runserver.py
+    ```
