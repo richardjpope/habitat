@@ -4,3 +4,4 @@ lib
 .Python
 *.pyc
 import-data
+celerybeat-schedule.db
