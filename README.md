@@ -35,6 +35,7 @@ This will take **a very long time to compile**, so it is best to leave this step
 ```
 
 * Install PIP package manager for python
+
 ```
     cd ~
     wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py
@@ -42,14 +43,18 @@ This will take **a very long time to compile**, so it is best to leave this step
     rm get-pip.py
     sudo pip install setuptools --no-use-wheel --upgrade
 ```
+
 * Get the code
+
 ```
     wget 'https://github.com/memespring/habitat/archive/master.zip'
     unzip master.zip
     mv habitat-master habitat
     rm master.zip
 ```
+
 * Install requirements
+
 ```
     cd ~/habitat
     sudo pip install -r habitat/requirements.txt
@@ -71,27 +76,35 @@ You will need to have the following already setup on your laptop:
 ###Setup
 
 * Make a directory and create a virtual environment
-   ``` 
+
+``` 
     mkdir habitat
     cd habitat
     virtualenv .
 ```
 * Grab the code
+
 ```
     git clone https://github.com/memespring/habitat.git
 ```
+
 * Enter virtual environment and install requirements
+
 ```
     source bin/activate
     pip install -r requirements.txt
 ```
+
 ### Running
 
 * Start Mongo DB (if it isnt already running):
+
 ```
     mongod
 ```
+
 * Enter virtual environment:
+
 ```
     source bin/activate
 ```
@@ -100,7 +113,9 @@ You will need to have the following already setup on your laptop:
 ```
     celery -A habitat.celery worker -B -l info
 ```
+
 * Start app
+
 ```
     python runserver.py
 ```
