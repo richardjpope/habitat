@@ -23,7 +23,7 @@ Feature: Near a point in space
     ssh pi@192.168.1.XX
     ```
 
-2.5 Setup extra storage
+3. Setup extra storage
 
     Insert a 64GB USB key, and then mount it by running:
 
@@ -32,7 +32,7 @@ Feature: Near a point in space
     sudo mount -t vfat /dev/sda1 /mnt/storage1
     sudo su -c "echo '/dev/sda1  /mnt/storage1  ext3 rw,defaults 0 0' >> /etc/fstab"
     ```
-3. Install and configure mongodb (based on https://github.com/RickP/mongopi). 
+4. Install and configure mongodb (based on https://github.com/RickP/mongopi). 
 
     This will take **a very long time to compile**, so it is best to leave this step running over night and use the `screen` command incase your connection to the raspberry pi drops during the process.
 
@@ -46,7 +46,7 @@ Feature: Near a point in space
     sudo scons --prefix=/opt/mongo install
     ```
 
-4. Install PIP package manager for python
+5. Install PIP package manager for python
 
     ```
     cd ~
@@ -56,7 +56,7 @@ Feature: Near a point in space
     sudo pip install setuptools --no-use-wheel --upgrade
     ```
 
-5. Get the code
+6. Get the code
 
     ```
     wget 'https://github.com/memespring/habitat/archive/master.zip'
@@ -65,7 +65,7 @@ Feature: Near a point in space
     rm master.zip
     ```
 
-6. Install requirements
+7. Install requirements
 
     ```
     cd ~/habitat
