@@ -4,10 +4,12 @@ Habitat is an external brain. It runs on a raspberry pi. It does things in respo
 
 ##Examples
 
-    Feature: Near a point in space
-        Scenario: Near a point in space 
-            When I am within 100 meters of "[0,0]"
-            Then ping "http://example.com/tad-ah"
+```
+Feature: Near a point in space
+    Scenario: Near a point in space 
+        When I am within 100 meters of "[0,0]"
+        Then ping "http://example.com/tad-ah"
+```
 
 ##Setting up a fresh Raspberry Pi with Habitat
 
@@ -15,14 +17,14 @@ Habitat is an external brain. It runs on a raspberry pi. It does things in respo
 
 * ssh into the server
 
-    ssh pi@192.168.1.XX
+    ```ssh pi@192.168.1.XX```
     
 
 * Install and configure mongodb (based on https://github.com/RickP/mongopi). 
 
 This will take **a very long time to compile**, so it is best to leave this step running over night and use the `screen` command incase your connection to the raspberry pi drops during the process.
 
-
+```
     screen
     cd ~
     sudo apt-get install git-core build-essential scons libpcre++-dev xulrunner-dev libboost-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev
@@ -30,27 +32,28 @@ This will take **a very long time to compile**, so it is best to leave this step
     cd mongopi
     scons
     sudo scons --prefix=/opt/mongo install
+```
 
 * Install PIP package manager for python
-
+```
     cd ~
     wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py
     sudo python get-pip.py
     rm get-pip.py
     sudo pip install setuptools --no-use-wheel --upgrade
-
+```
 * Get the code
-
+```
     wget 'https://github.com/memespring/habitat/archive/master.zip'
     unzip master.zip
     mv habitat-master habitat
     rm master.zip
-
+```
 * Install requirements
-
+```
     cd ~/habitat
     sudo pip install -r habitat/requirements.txt
-
+```
 
 **TODO: document how to start everything running**
 
@@ -68,34 +71,36 @@ You will need to have the following already setup on your laptop:
 ###Setup
 
 * Make a directory and create a virtual environment
-    
+   ``` 
     mkdir habitat
     cd habitat
     virtualenv .
-
+```
 * Grab the code
-
+```
     git clone https://github.com/memespring/habitat.git
-
+```
 * Enter virtual environment and install requirements
-
+```
     source bin/activate
     pip install -r requirements.txt
-
+```
 ### Running
 
 * Start Mongo DB (if it isnt already running):
-
+```
     mongod
-
+```
 * Enter virtual environment:
-
+```
     source bin/activate
-
+```
 * Start celery worker 
+
+```
     celery -A habitat.celery worker -B -l info
-
+```
 * Start app
-
+```
     python runserver.py
-
+```
