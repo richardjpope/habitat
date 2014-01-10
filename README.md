@@ -16,6 +16,7 @@ Habitat is an external brain. It runs on a raspberry pi. It does things in respo
 * ssh into the server
 
 	ssh pi@192.168.1.XX
+	
 
 * Install and configure mongodb (based on https://github.com/RickP/mongopi). 
 
