@@ -15,12 +15,23 @@ Feature: Near a point in space
 
 1.  Setup headless server with Raspbarian: http://www.penguintutor.com/linux/raspberrypi-headless
 
+**TODO: add stuff about overclocking and swap file size? **
+
 2. ssh into the server
 
     ```
     ssh pi@192.168.1.XX
     ```
-    
+
+2.5 Setup extra storage
+
+    Insert a 64GB USB key, and then mount it by running:
+
+    ```
+    sudo mkdir /mnt/storage1
+    sudo mount -t vfat /dev/sda1 /mnt/storage1
+    sudo su -c "echo '/dev/sda1  /mnt/storage1  ext3 rw,defaults 0 0' >> /etc/fstab"
+    ```
 3. Install and configure mongodb (based on https://github.com/RickP/mongopi). 
 
     This will take **a very long time to compile**, so it is best to leave this step running over night and use the `screen` command incase your connection to the raspberry pi drops during the process.
