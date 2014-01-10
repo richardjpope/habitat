@@ -32,6 +32,7 @@ This will take **a very long time to compile**, so it is best to leave this step
 	sudo scons --prefix=/opt/mongo install
 
 * Install PIP package manager for python
+
 	cd ~
 	wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py
 	sudo python get-pip.py
