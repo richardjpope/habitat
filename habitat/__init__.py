@@ -9,7 +9,7 @@ from logging.handlers import RotatingFileHandler
 
 #app
 app = Flask(__name__)
-app.config.from_pyfile('config.py')
+app.config.from_object('config')
 db = MongoEngine(app)
 
 #logging

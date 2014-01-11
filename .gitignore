@@ -5,3 +5,4 @@ lib
 *.pyc
 import-data
 celerybeat-schedule.db
+local_config.py
