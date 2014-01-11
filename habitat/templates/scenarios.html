@@ -15,6 +15,9 @@
             </div>
         {% endfor %}
     </div>
+    <form action="{{url_for('edit', scenario_id='new')}}" method="get">
+        <button type="submit" class="btn btn-primary">Add new</button>
+    </form>
     <script type="text/javascript">
     $('.scenario .code .raw').each(function( index ) {
          var myCodeMirror = CodeMirror(this.parentNode, {
