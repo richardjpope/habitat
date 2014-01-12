@@ -13,9 +13,7 @@ Feature: Near a point in space
 
 ##Setting up a fresh Raspberry Pi with Habitat
 
-1.  Setup headless server with Raspbarian: http://www.penguintutor.com/linux/raspberrypi-headless
-
-**TODO: add stuff about overclocking and swap file size? **
+1.  Setup headless server with Raspbarian + >= 16 GB SD card: http://www.penguintutor.com/linux/raspberrypi-headless
 
 2. ssh into the server
 
@@ -23,20 +21,33 @@ Feature: Near a point in space
     ssh pi@192.168.1.XX
     ```
 
-3. Setup extra storage
+3. Configure the Raspberry Pi by running  ```sudo raspi-config ```. Make the following changes:
+    * 'Change user password'
+    * 'Expand filesystem'
+    * 'Overclock' set to *turbo*
+    * 'Advanced' > 'Hostname' set to 'habitat'
+    * 'Advanced' >  'Memory split' set to 16
+    * If you are not in the UK, set the time zone
 
-    Insert a 64GB USB key, and then mount it by running:
+    Then reboot when you are asked to, and ssh in again.
+
+
+4. Setup extra storage
+
+    Insert a 64GB USB stick, and then mount it by running:
 
     ```
     sudo mkdir /mnt/storage1
     sudo mount -t vfat /dev/sda1 /mnt/storage1
     sudo su -c "echo '/dev/sda1  /mnt/storage1  ext3 rw,defaults 0 0' >> /etc/fstab"
     ```
-4. Install and configure mongodb (based on https://github.com/RickP/mongopi). 
+
+5. Install mongodb (based on https://github.com/RickP/mongopi). 
 
     This will take **a very long time to compile**, so it is best to leave this step running over night and use the `screen` command incase your connection to the raspberry pi drops during the process.
 
     ```
+    sudo apt-get install screen
     screen
     cd ~
     sudo apt-get install git-core build-essential scons libpcre++-dev xulrunner-dev libboost-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev
@@ -44,9 +55,30 @@ Feature: Near a point in space
     cd mongopi
     scons
     sudo scons --prefix=/opt/mongo install
+
+    PATH=$PATH:/opt/mongo/bin/
+    export PATH
+
     ```
 
-5. Install PIP package manager for python
+6. Configure mongodb - create user, set data to be stored on USB stick, auto start.
+
+    ```
+    sudo useradd mongodb
+    sudo mkdir /mnt/storage1/mongodb
+    sudo chown mongodb:mongodb /mnt/storage1/mongodb
+   
+    sudo mkdir /etc/mongodb/
+    sudo sh -c 'echo "dbpath=/mnt/storage1/mongodb" > /etc/mongodb/mongodb.conf'
+
+    cd /etc/init.d
+    sudo wget -O mongodb https://gist.github.com/memespring/b19734772f9f19fa2622/raw/12348660841dd2b33388d7b08c8328fa48b25e6e/mongodb.sh
+    sudo chmod +x mongodb
+    sudo update-rc.d mongodb defaults
+    sudo service mongodb start
+
+    ```
+7. Install PIP package manager for python
 
     ```
     cd ~
@@ -56,7 +88,7 @@ Feature: Near a point in space
     sudo pip install setuptools --no-use-wheel --upgrade
     ```
 
-6. Get the code
+8. Get the code
 
     ```
     wget 'https://github.com/memespring/habitat/archive/master.zip'
@@ -65,7 +97,7 @@ Feature: Near a point in space
     rm master.zip
     ```
 
-7. Install requirements
+9. Install requirements
 
     ```
     cd ~/habitat

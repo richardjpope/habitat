@@ -1,12 +1,12 @@
 Next:
 
-
 Some point:
 
 * when saving, check for existance of functions referenced by the test?
 * move source settings to dedicated collection wuth api details hashed
 * display the log file using websockets
 * handle timezones
+* scenarios should be stored in a local git repo
 
 Done:
 
@@ -14,17 +14,3 @@ Done:
 * add exception handing to fetch events and process event
 
 -----------------------------
-Ideas for modules:
-
-	- authenticate/register (form and code)
-	- setting fields
-
-Ideas for models:
-	- event (somehting happended)
-	- location
-	- message
-	- register itself with scheduler
-
-Missing components:
-	- message que
-	- scheduler
