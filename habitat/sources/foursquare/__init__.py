@@ -34,7 +34,7 @@ class Foursquare(SourceBase):
         access_code = request.args.get('code', None)
         if request.method == 'GET' and access_code:
 
-            client = foursquare_api.Foursquare(client_id=setting.value['client-id'], client_secret=setting.value['client-secret'], redirect_uri='http://localhost:5000/settings/foursquare')
+            client = foursquare_api.Foursquare(client_id=setting.value['client-id'], client_secret=setting.value['client-secret'], redirect_uri='%s/settings/foursquare' % app.config['BASE_URL'])
             access_token = client.oauth.get_token(access_code)
 
             setting.value['access-token'] = access_token
@@ -57,7 +57,7 @@ class Foursquare(SourceBase):
             setting = setting.save()
 
             #do oauth thing
-            client = foursquare_api.Foursquare(client_id=setting.value['client-id'], client_secret=setting.value['client-secret'], redirect_uri='http://localhost:5000/settings/foursquare')
+            client = foursquare_api.Foursquare(client_id=setting.value['client-id'], client_secret=setting.value['client-secret'], redirect_uri='%s/settings/foursquare' % app.config['BASE_URL'])
             return redirect(client.oauth.auth_url())
 
         instructions = ['Visit <a href="https://developer.foursquare.com">developer.foursquare.com</a> and create a new app', "Enter the 'Client ID' and 'Client Secret' for the app in the boxes above.", "Click save and authorise Habitat to access your Foursquare data."]

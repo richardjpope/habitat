@@ -73,7 +73,7 @@ class Twitter(SourceBase):
             setting = setting.save()
 
             #do oauth thing
-            auth = twitter_api.OAuthHandler(str(setting.value['consumer-key']), str(setting.value['consumer-secret']), 'http://127.0.0.1:5000/settings/twitter')
+            auth = twitter_api.OAuthHandler(str(setting.value['consumer-key']), str(setting.value['consumer-secret']), '%s/settings/twitter' % app.config['BASE_URL'])
             redirect_url =  auth.get_authorization_url()
             session['twitter-request-token'] = (auth.request_token.key, auth.request_token.secret)
             return redirect(redirect_url)
