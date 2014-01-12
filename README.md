@@ -1,4 +1,4 @@
-**NOTE: This is at a very early stage work in progress. If you install it, you will probably be disapointed.**
+**NOTE: This is a very early stage work in progress. If you install it, you will probably be disapointed.**
 
 Habitat is an external brain. It runs on a raspberry pi. It does things in response to your interactions with your digital-physical environment using behavior-driven development style tests.
 
@@ -132,7 +132,7 @@ Feature: Near a point in space
 
     Then visit http://habitat:5000
 
-    **TODO: Eventually there needs to be somehitng that starts these on reboot, but for dev it is easier to start manually**
+    **TODO: Eventually there needs to be something that starts these on reboot, but for dev it is easier to start manually**
 
 
 ##Seting up a development copy of habitat (i.e. if you want to contribute)
