@@ -1,4 +1,4 @@
-**NOTE: This is at a very early stage work in progress. If you install it, you will probably be disapointed.**
+**NOTE: This is a very early stage work in progress. If you install it, you will probably be disapointed.**
 
 Habitat is an external brain. It runs on a raspberry pi. It does things in response to your interactions with your digital-physical environment using behavior-driven development style tests.
 
