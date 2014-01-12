@@ -1,6 +1,6 @@
 DEBUG = True
-MONGODB_SETTINGS = {'DB': ''}
+MONGODB_SETTINGS = {'DB': "habitat"}
+CELERY_BROKER_URL='mongodb://localhost:27017/habitat-tasks'
+CELERY_RESULT_BACKEND='mongodb://localhost:27017/habitat-tasks'
+CELERY_TIMEZONE = 'Europe/London'
 SECRET_KEY = ''
-CELERY_BROKER_URL=''
-CELERY_RESULT_BACKEND=''
-CELERY_TIMEZONE = ''

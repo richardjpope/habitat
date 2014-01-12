@@ -82,27 +82,39 @@ Feature: Near a point in space
 
     ```
     cd ~
+    wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py
+    sudo python ez_setup.py
+    rm ez_setup.py
     wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py
     sudo python get-pip.py
     rm get-pip.py
-    sudo pip install setuptools --no-use-wheel --upgrade
     ```
 
 8. Get the code
 
+    **TODO: this should eventually pull from a specific release zip file ratehr than git, but this is easier for dev**
+
     ```
-    wget 'https://github.com/memespring/habitat/archive/master.zip'
-    unzip master.zip
-    mv habitat-master habitat
-    rm master.zip
+    cd ~
+    git clone https://github.com/memespring/habitat.git
     ```
 
 9. Install requirements
 
     ```
     cd ~/habitat
-    sudo pip install -r habitat/requirements.txt
+    sudo pip install -r requirements.txt
     ```
+
+10. Create local config
+
+    ```
+    cd ~/habitat
+    cp local_config.py.git local_config.py
+    nano local_config.py
+    ```
+
+    And add a randoms tring of numbers and letters to the SECRET_KEY setting
 
 **TODO: document how to start everything running**
 
