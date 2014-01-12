@@ -14,7 +14,7 @@ def step_impl(context, distance, location):
 	#latlng = [float(match.group(1)), float(match.group(2))]
 	#location = models.Location.objects(latlng__near=latlng, latlng__max_distance=distance, occured_at__lte=since)
 	since = datetime.now() - timedelta(minutes=5)
-	lat = (float(match.group(1))
-	lng = (float(match.group(2))
+	lat = float(match.group(1)
+	lng = float(match.group(2)
 	location = models.Location.objects(latlng__within_distance=[(lat,lng),distance], occured_at__lte=since)
 	assert len(location) > 0
