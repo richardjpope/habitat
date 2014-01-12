@@ -78,6 +78,7 @@ Feature: Near a point in space
     sudo service mongodb start
 
     ```
+
 7. Install PIP package manager for python
 
     ```
@@ -90,7 +91,14 @@ Feature: Near a point in space
     rm get-pip.py
     ```
 
-8. Get the code
+8. Install a few other things
+    **TODO: setup STARTTLS for sendmail? **
+
+    ```
+    sudo apt-get install sendmail
+    ```
+
+9. Get the code
 
     **TODO: this should eventually pull from a specific release zip file ratehr than git, but this is easier for dev**
 
@@ -99,14 +107,14 @@ Feature: Near a point in space
     git clone https://github.com/memespring/habitat.git
     ```
 
-9. Install requirements
+10. Install requirements
 
     ```
     cd ~/habitat
     sudo pip install -r requirements.txt
     ```
 
-10. Create local config
+11. Create local config
 
     ```
     cd ~/habitat
@@ -114,9 +122,17 @@ Feature: Near a point in space
     nano local_config.py
     ```
 
-    And add a randoms tring of numbers and letters to the SECRET_KEY setting
+    And add a randoms tring of numbers and letters to the SECRET_KEY setting, and your email address to EMAIL_TO
 
-**TODO: document how to start everything running**
+12. Start running
+    ```
+    celery -A habitat.celery worker -B -l info
+    python runserver.py
+    ```
+
+    Then visit http://habitat:5000
+
+    **TODO: Eventually there needs to be somehitng that starts these on reboot, but for dev it is easier to start manually**
 
 
 ##Seting up a development copy of habitat (i.e. if you want to contribute)
@@ -128,6 +144,7 @@ You will need to have the following already setup on your laptop:
 - virtualenv
 - MongoDB
 - git
+- sendmail
 
 ###Setup
 

@@ -5,7 +5,6 @@ import json
 import re
 from habitat import app
 
-#@given('I am within {distance:d} meters of lat/lng "{latlng}"')
 @when(u'I am within {distance:d} meters of "{location}"')
 def step_impl(context, distance, location):
 

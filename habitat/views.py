@@ -41,7 +41,7 @@ def edit(scenario_id):
 
         feature_file_path = utils.get_feature_file_name(scenario_id)
         if scenario_id == 'new':
-            feature_file_path = utils.get_feature_file_name(generate_feature_file_name(feature))
+            feature_file_path = utils.get_feature_file_name(utils.generate_feature_file_name(feature))
 
         file_ref = open(feature_file_path, 'w')
         file_ref.write(utils.feature_to_string(feature))
