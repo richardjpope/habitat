@@ -8,7 +8,7 @@ from habitat import app
 @when(u'I am within {distance:d} meters of "{location}"')
 def step_impl(context, distance, location):
 
-	match = re.search('^\[(\d+\.?\d*),(\d+\.?\d*)\]$', location)
+	match = re.search('^\[-?(\d+\.?\d*),-?(\d+\.?\d*)\]$', location)
 	assert match
 
 	latlng = [float(match.group(1)), float(match.group(2))]
