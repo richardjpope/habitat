@@ -109,7 +109,7 @@ class Foursquare(SourceBase):
         try:
             location.save()
             app.logger.info('Saved a location from a Foursquare event')
-        except:
-            app.logger.error('Failed to save a location from Foursquare')
+        except Exception, e:
+            app.logger.error('Failed to save a location from Foursquare: %s' % e)
 
 SourceBase.register(Foursquare)

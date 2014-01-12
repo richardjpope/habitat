@@ -1,4 +1,4 @@
-from mongoengine import StringField, PolygonField, DateTimeField, PointField, StringField, DictField, DynamicDocument, Document, ObjectIdField
+from mongoengine import StringField, PolygonField, DateTimeField, GeoPointField, StringField, DictField, DynamicDocument, Document, ObjectIdField
 from mongoengine import signals
 from mongoengine import DoesNotExist
 import datetime
@@ -19,7 +19,7 @@ class Event(DynamicDocument):
             return False
 
 class Location(DynamicDocument):
-    latlng = PointField()
+    latlng = GeoPointField()
     event_id = ObjectIdField
     occured_at = DateTimeField()
 
