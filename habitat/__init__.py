@@ -1,16 +1,26 @@
+from __future__ import with_statement, absolute_import
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
-from flask.ext.mongoengine import MongoEngine
+from flask.ext.sqlalchemy import SQLAlchemy
 from celery import Celery
 import os
 import logging
 import uuid
 from logging.handlers import RotatingFileHandler
+from pysqlite2 import dbapi2 as sqlite
+
+import sqlalchemy
 
 #app
 app = Flask(__name__)
 app.config.from_object('config')
-db = MongoEngine(app)
+db = SQLAlchemy(app)
+
+@sqlalchemy.event.listens_for(db.engine, "connect")
+def connect(dbapi_connection, connection_rec):
+    dbapi_connection.enable_load_extension(True)
+    dbapi_connection.execute("select load_extension('/usr/local/lib/libspatialite.so')")
+    dbapi_connection.enable_load_extension(False)
 
 #logging
 file_handler = logging.handlers.RotatingFileHandler(app.config['HABITAT_LOG_FILE'], maxBytes=1024 * 1024 * 100, backupCount=20)
@@ -32,10 +42,10 @@ class ContextTask(TaskBase):
 celery.Task = ContextTask
 
 import habitat.views
-import tasks
+import habitat.tasks
 
-from sources.foursquare import Foursquare
+from habitat.sources.foursquare import Foursquare
 Foursquare()
 
-from sources.twitter import Twitter
+from habitat.sources.twitter import Twitter
 Twitter()

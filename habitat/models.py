@@ -1,38 +1,48 @@
-from mongoengine import StringField, PolygonField, DateTimeField, GeoPointField, StringField, DictField, DynamicDocument, Document, ObjectIdField
-from mongoengine import signals
-from mongoengine import DoesNotExist
+# from mongoengine import StringField, PolygonField, DateTimeField, GeoPointField, StringField, DictField, DynamicDocument, Document, ObjectIdField
+# from mongoengine import signals
+# from mongoengine import DoesNotExist
+from habitat import db
 import datetime
 from habitat import tasks
+#from geoalchemy import GeometryColumn, Point
+from flask.ext.sqlalchemy import models_committed, Session
 
-class Event(DynamicDocument):
-    guid = StringField(max_length=255, required=True, unique=True)
-    source = StringField(max_length=25, required=True) 
-    occured_at = DateTimeField()
-    data = DictField(required=True)
+class Event(db.Model):
+    __tablename__ = 'event'
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    guid = db.Column(db.String(255), nullable=False, unique=True)
+    source = db.Column(db.String(25), nullable=False)
+    occured_at = db.DateTime()
+    data = db.Column(db.Text(), nullable=False)
 
     @staticmethod
     def guid_exists(guid):
-        try:
-            event = Event.objects.get(guid=guid)
-            return True
-        except DoesNotExist:
-            return False
+        # try:
+        event = Event.query.get(guid=guid)
+        #     return True
+        # except DoesNotExist:
+        #     return False
 
-class Location(DynamicDocument):
-    latlng = GeoPointField()
-    event_id = ObjectIdField
-    occured_at = DateTimeField()
+class Location(db.Model):
+    __tablename__ = 'location'
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    # latlng = GeoPointField()
+    # latlng = GeometryColumn(Point(2))
+    event_id = db.Column(db.Integer, nullable=False) #intentionally set no foreign key here.
+    occured_at = db.DateTime()
 
     @classmethod
     def post_save(cls, sender, document, **kwargs):
         tasks.run_scenarios.delay()
 
-class Setting(Document):
-    key = StringField(max_length=25, required=True, unique=True)
-    value = DictField(required=True)
+class Setting(db.Model):
 
-class Fence(DynamicDocument):
-    category = StringField(max_length=25, required=True)
-    polygon = PolygonField()
+    __tablename__ = 'setting'
+    key = db.Column(db.String(25), nullable=False, primary_key=True, unique=True)
+    value = db.Column(db.Text(), nullable=False)
+
+# class Fence(DynamicDocument):
+#     category = StringField(max_length=25, required=True)
+#     polygon = PolygonField()
   
-signals.post_save.connect(Location.post_save, sender=Location)
+#models_committed.connect(Location.post_save, sender=Location)

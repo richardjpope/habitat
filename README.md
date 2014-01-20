@@ -194,3 +194,30 @@ You will need to have the following already setup on your laptop:
     ```
     python runserver.py
     ```
+
+
+
+----------------------
+
+Ubuntu dev setup
+
+sudo apt-get install python-setuptools
+sudo apt-get install sendmail
+sudo apt-get install spatialite-bin
+sudo apt-get install python-pip
+sudo pip install virtualenv
+sudo apt-get install git
+sudo apt-get install sqlite3
+sudo apt-get install libpq-dev python-dev
+sudo apt-get install libsqlite3-dev
+
+Install GEOS, PROJ.4 and libspatialite as per geodjango instructions
+
+[setup shared directory]
+[setup a virtualenv in home directory]
+
+
+pip install -r requirements.txt
+
+
+Do the thing with sqlite3: https://docs.djangoproject.com/en/1.6/ref/contrib/gis/install/spatialite/

@@ -1,5 +1,7 @@
 Next:
 
+- fix model saved signal
+
 Some point:
 
 * when saving, check for existance of functions referenced by the test?

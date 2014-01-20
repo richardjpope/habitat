@@ -7,6 +7,7 @@ import zipfile
 from habitat import models
 from habitat import tasks
 from habitat import app
+from habitat import db
 
 data_dir = data_dir = '%s/import-data' % os.path.dirname(os.path.abspath(__file__))
 
@@ -50,6 +51,13 @@ class ImportOSM(Command):
             fence.polygon = shapes[i].__geo_interface__
             fence.save()
 
+class Setup(Command):
+
+    def run(self):
+        print "Creating database ..."
+        db.create_all()
+
+
 class RunScenarios(Command):
 
     def run(self):
@@ -60,6 +68,7 @@ manager = Manager(app)
 manager.add_command('import-osm', ImportOSM())
 manager.add_command('download-osm', DownloadOSM())
 manager.add_command('run-scenarios', RunScenarios())
+manager.add_command('setup', Setup())
 
 if __name__ == "__main__":
     manager.run()

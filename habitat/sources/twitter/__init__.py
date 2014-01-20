@@ -1,6 +1,5 @@
 from wtforms import Form, TextField, validators
 import tweepy as twitter_api
-from mongoengine import DoesNotExist
 from flask import request, redirect, flash, session, render_template, current_app
 from habitat import models
 from habitat import tasks

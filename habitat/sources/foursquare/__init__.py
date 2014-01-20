@@ -1,13 +1,12 @@
 from wtforms import Form, TextField, validators
 import foursquare as foursquare_api
-from mongoengine import DoesNotExist
 from flask import request, redirect, flash, session, render_template
 from habitat import models
 from habitat import tasks
 from habitat import utils
 from habitat.sources import SourceBase
 from datetime import datetime
-from habitat import celery, app
+from habitat import celery, app, db
 
 class Foursquare(SourceBase):
 
@@ -23,9 +22,8 @@ class Foursquare(SourceBase):
     def settings_view():
 
         form = Foursquare.SettingsForm(request.form)
-        try:
-            setting = models.Setting.objects.get(key='foursquare-auth') # add default
-        except DoesNotExist:
+        setting = models.Setting.query.filter_by(key='foursquare-auth').first()
+        if setting == None:
             setting = models.Setting()
             setting.key = 'foursquare-auth'
             setting.value = {'client-id': None, 'client-secret':None, 'access-token':None}
