@@ -1,0 +1,9 @@
+bin
+include
+/lib
+.Python
+*.pyc
+import-data
+celerybeat-schedule.db
+local_config.py
+habitat.log

@@ -1,0 +1,20 @@
+DEBUG = True
+MONGODB_SETTINGS = {'DB': "habitat"}
+CELERY_BROKER_URL='mongodb://localhost:27017/habitat-tasks'
+CELERY_RESULT_BACKEND='mongodb://localhost:27017/habitat-tasks'
+CELERY_TIMEZONE = 'Europe/London'
+SECRET_KEY = ''
+EMAIL_TO = ''
+BASE_URL = 'http://habitat:5000'
+
+DEBUG = True
+SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/habitat.db'
+SECRET_KEY = 'fmdnkslr4u8932b3n2'
+CELERY_BROKER_URL='redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_TIMEZONE = 'Europe/London'
+EMAIL_TO = 'memespring@gmail.com'
+BASE_URL = 'http://localhost:5001'
+SQLALCHEMY_ECHO = True
+
+
