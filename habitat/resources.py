@@ -1,28 +1,11 @@
-import os
-import glob
 import json
 import geojson
 import dateutil.parser
-from datetime import datetime
 from flask import make_response
 from flask.ext.restful import reqparse, abort, Api, Resource
 from mongoengine import DoesNotExist, ValidationError
-from behave import parser as behave_parser
-from behave import model as behave_models
 from habitat import api, models, app
 
-def get_feature_file_name(feature_id):
-    feature_id = feature_id.replace('.', '').replace('/', '') #make safe(er) to stop ../../     
-    return os.path.join(app.config['FEATURE_DIR'], feature_id + '.feature')
-
-def feature_to_string(feature):
-    result = "%s: %s \n" % (feature.keyword, feature.name)
-    for scenario in feature:
-        result = "%s    %s: %s \n" % (result, scenario.keyword, scenario.name)
-        for step in scenario.steps:
-            result = "%s        %s %s \n" % (result, step.keyword, step.name)
-    return result
-    
 def geojson_point(data):
     try:
         point =  geojson.Point(type=data['type'],coordinates=data['coordinates'])
@@ -42,7 +25,7 @@ def get_or_abort(_id, cls):
         abort(404, message="%s %s does not exist" % (cls._class_name, _id))
 
 class Location(Resource):
-        
+
     def get(self, _id):
         return get_or_abort(_id, models.Location).to_dict()
 
@@ -52,11 +35,10 @@ class Location(Resource):
         return '', 204
 
 class Locations(Resource):
-    
+
     def __init__(self):
         self.parser = reqparse.RequestParser()
         super(TaskAPI, self).__init__()
-           
 
     def get(self):
     	result = []
@@ -82,20 +64,53 @@ class Locations(Resource):
         return str(location.id)
 
 class Scenarios(Resource):
+
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        super(Scenarios, self).__init__()
+
     def get(self):
-        features = []
-        for feature_file_path in glob.glob(app.config['SCENARIOS_DIR'] + '/*.feature'):
+        result = []
+        scenarios = models.Scenario.list()
+        for scenario in scenarios:
+            result.append(scenario.to_dict())
 
-            feature = behave_parser.parse_file(feature_file_path)
-            feature_id = os.path.basename(feature_file_path).split('.')[0]
-            modified_at = datetime.fromtimestamp(os.path.getmtime(feature_file_path)).isoformat()
+        return result
 
-            features.append({'code': feature_to_string(feature), 'modified_at': modified_at, 'feature_id': feature_id})
-        
-        return features
-        
+class Scenario(Resource):
+
+    def get(self, _id):
+        try:
+            return models.Scenario.get(_id).to_dict()
+        except IOError:
+            abort(404, message="Scenario %s does not exist" % (_id))
+        # return get_or_abort(_id, models.Location).to_dict()
+
+    def delete(self, _id):
+        try:
+            scenario = models.Scenario.get(_id)
+            scenario.delete()
+            return '', 204
+        except IOError:
+            abort(404, message="Scenario %s does not exist" % (_id))
+
+    # def post(self):
+    #
+    #     self.parser.add_argument('code', type=str, required=True, location='json', help="must contain a valid given/when/then scenario")
+    #     args = self.parser.parse_args()
+    #
+    #     feature = behave_parser.parse_feature(args['code'])
+    #     file_name = generate_feature_file_name(feature)
+    #     file_path = get_feature_file_name(file_name)
+    #
+    #     file_ref = open(feature_file_path, 'w')
+    #     file_ref.write(utils.feature_to_string(feature))
+    #
+    #     return os.path.basename(file_path).split('.')[0]
+    #
 
 #routes
 api.add_resource(Locations, '/locations')
 api.add_resource(Location, '/locations/<string:_id>')
 api.add_resource(Scenarios, '/scenarios')
+api.add_resource(Scenario, '/scenarios/<string:_id>')
