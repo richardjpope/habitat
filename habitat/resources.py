@@ -6,6 +6,7 @@ from flask.ext.restful import reqparse, abort, Api, Resource
 from mongoengine import DoesNotExist, ValidationError
 from habitat import api, models, app
 
+#validators for various field types (must return ValueError if fails)
 def geojson_point(data):
     try:
         point =  geojson.Point(type=data['type'],coordinates=data['coordinates'])
@@ -13,10 +14,18 @@ def geojson_point(data):
     except ValueError:
         raise ValueError
 
+def feature_code(data):
+
+    scenario = models.Scenario(code=data)
+    if scenario.validate():
+        return data
+    else:
+        raise ValueError
+
 def iso_date(data):
     return dateutil.parser.parse(data)
 
-def get_or_abort(_id, cls):
+def mongo_get_or_abort(_id, cls):
     try:
         return cls.objects.get(id=_id)
     except ValidationError:
@@ -27,10 +36,10 @@ def get_or_abort(_id, cls):
 class Location(Resource):
 
     def get(self, _id):
-        return get_or_abort(_id, models.Location).to_dict()
+        return mongo_get_or_abort(_id, models.Location).to_dict()
 
     def delete(self, _id):
-        location = get_or_abort(_id, models.Location)
+        location = mongo_get_or_abort(_id, models.Location)
         location.delete()
         return '', 204
 
@@ -38,7 +47,7 @@ class Locations(Resource):
 
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        super(TaskAPI, self).__init__()
+        super(Locations, self).__init__()
 
     def get(self):
     	result = []
@@ -61,7 +70,7 @@ class Locations(Resource):
         except ValidationError, e:
             app.logger.error('Failed to save a location: %s' % e)
 
-        return str(location.id)
+        return location.to_dict(), 201
 
 class Scenarios(Resource):
 
@@ -77,14 +86,45 @@ class Scenarios(Resource):
 
         return result
 
+    def post(self):
+        self.parser.add_argument('code', type=feature_code, required=True, location='json', help="must be a valid scenario")
+        args = self.parser.parse_args()
+        try:
+            scenario.save()
+            return scenario.to_dict(), 201
+        except IOError:
+            return 'Unable to create scenario', 500
+
 class Scenario(Resource):
 
-    def get(self, _id):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        super(Scenario, self).__init__()
+
+    def _get_or_abort(self, _id):
         try:
-            return models.Scenario.get(_id).to_dict()
+            return models.Scenario.get(_id)
         except IOError:
             abort(404, message="Scenario %s does not exist" % (_id))
-        # return get_or_abort(_id, models.Location).to_dict()
+
+
+    def get(self, _id):
+
+        return self._get_or_abort(_id).to_dict()
+
+    def put(self, _id):
+
+        scenario = self._get_or_abort(_id)
+
+        self.parser.add_argument('code', type=feature_code, required=True, location='json', help="must be a valid scenario")
+        args = self.parser.parse_args()
+
+        scenario.code = args['code']
+        try:
+            scenario.save()
+            return scenario.to_dict(), 201
+        except IOError:
+            return 'Unable to save scenario', 500
 
     def delete(self, _id):
         try:
@@ -93,21 +133,6 @@ class Scenario(Resource):
             return '', 204
         except IOError:
             abort(404, message="Scenario %s does not exist" % (_id))
-
-    # def post(self):
-    #
-    #     self.parser.add_argument('code', type=str, required=True, location='json', help="must contain a valid given/when/then scenario")
-    #     args = self.parser.parse_args()
-    #
-    #     feature = behave_parser.parse_feature(args['code'])
-    #     file_name = generate_feature_file_name(feature)
-    #     file_path = get_feature_file_name(file_name)
-    #
-    #     file_ref = open(feature_file_path, 'w')
-    #     file_ref.write(utils.feature_to_string(feature))
-    #
-    #     return os.path.basename(file_path).split('.')[0]
-    #
 
 #routes
 api.add_resource(Locations, '/locations')

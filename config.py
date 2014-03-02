@@ -1,6 +1,7 @@
 import os
 
-FEATURE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'habitat/scenarios')
+SCENARIOS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scenarios')
+PLUGINS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'plugins')
 # SENDMAIL_PATH = '/usr/sbin/sendmail'
 
 HABITAT_LOG_FILE = 'habitat.log'
