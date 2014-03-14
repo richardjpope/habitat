@@ -1,5 +1,10 @@
 import json
 import geojson
+import glob
+import os
+import imp
+import re
+import inspect
 import dateutil.parser
 from flask import make_response
 from flask.ext.restful import reqparse, abort, Api, Resource
@@ -9,7 +14,7 @@ from habitat import api, models, app
 #validators for various field types (must return ValueError if fails)
 def geojson_point(data):
     try:
-        point =  geojson.Point(type=data['type'],coordinates=data['coordinates'])
+        point =  geojson.Point(type=data['type'], coordinates=data['coordinates'])
         return data
     except ValueError:
         raise ValueError
@@ -58,8 +63,8 @@ class Locations(Resource):
 
     def post(self):
 
-        self.parser.add_argument('latlng', type=geojson_point, required=True, location='json', help="must be a valid geojson point")
-        self.parser.add_argument('occured_at', type=iso_date, required=True, location='json', help="must be a valid date time")
+        self.parser.add_argument('latlng', type=geojson_point, required=True, location='json', help="latlng must be a valid geojson point")
+        self.parser.add_argument('occured_at', type=iso_date, required=True, location='json', help="occured_at must be a valid date time")
         args = self.parser.parse_args()
 
         try:
@@ -134,8 +139,39 @@ class Scenario(Resource):
         except IOError:
             abort(404, message="Scenario %s does not exist" % (_id))
 
+class Plugins(Resource):
+
+    def get(self):
+
+        results = []
+        for file_path in glob.glob(app.config['PLUGINS_DIR'] + '/*/__init__.py'):
+            plugin_module_path = os.path.dirname(file_path)
+            plugin_module_name = os.path.basename(plugin_module_path)
+            plugin_module = imp.load_source(plugin_module_name, file_path)
+
+            steps = imp.load_source('steps', plugin_module_path + '/steps.py')
+
+        result = {'name': plugin_module.__name__ ,'steps': []}
+
+        functions = inspect.getmembers(steps, predicate=inspect.isroutine)
+        for function in functions:
+            if function[1].__module__ == steps.__name__:
+
+                code = inspect.getsourcelines(function[1])[0][0]
+                regex = re.compile('@given|@when|@then')
+                match = regex.match(code)
+
+                if match:
+                    about = inspect.getdoc(function[1])
+                    code = code.replace('@given(\'', 'Given ').replace('@when(\'', 'When ').replace('@then(\'', 'Then ').replace('\n', '')
+                    result['steps'].append({'code': code, 'about': about})
+
+        return result
+
+
 #routes
 api.add_resource(Locations, '/locations')
 api.add_resource(Location, '/locations/<string:_id>')
 api.add_resource(Scenarios, '/scenarios')
 api.add_resource(Scenario, '/scenarios/<string:_id>')
+api.add_resource(Plugins, '/plugins')

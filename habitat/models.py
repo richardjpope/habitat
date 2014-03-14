@@ -22,6 +22,9 @@ class Location(DynamicDocument):
 
 signals.post_save.connect(Location.post_save, sender=Location)
 
+def __init__(self, _id=None):
+        self.id = _id
+
 #not a mongo model, so not sure it should really be here.
 class Scenario():
 
