@@ -1,8 +1,10 @@
 bin
 include
 /lib
+scenarios/*.feature
 .Python
 *.pyc
+.DS_Store
 import-data
 celerybeat-schedule.db
 local_config.py

@@ -10,6 +10,7 @@ from flask import make_response
 from flask.ext.restful import reqparse, abort, Api, Resource
 from mongoengine import DoesNotExist, ValidationError
 from habitat import api, models, app
+from flask_restful.utils import cors
 
 #validators for various field types (must return ValueError if fails)
 def geojson_point(data):
@@ -22,6 +23,7 @@ def geojson_point(data):
 def feature_code(data):
 
     scenario = models.Scenario(code=data)
+
     if scenario.validate():
         return data
     else:
@@ -83,18 +85,27 @@ class Scenarios(Resource):
         self.parser = reqparse.RequestParser()
         super(Scenarios, self).__init__()
 
+    #
+    # def options(self):
+    #   return {'Allow' : 'PUT' }, 200, { 'Access-Control-Allow-Origin': '*','Access-Control-Allow-Methods' : 'PUT,GET' }
+
+    def options(self):
+      pass
+
     def get(self):
+
         result = []
         scenarios = models.Scenario.list()
         for scenario in scenarios:
             result.append(scenario.to_dict())
-
-        return result
+        return result, 200
 
     def post(self):
         self.parser.add_argument('code', type=feature_code, required=True, location='json', help="must be a valid scenario")
         args = self.parser.parse_args()
         try:
+            scenario = models.Scenario()
+            scenario.code = args['code']
             scenario.save()
             return scenario.to_dict(), 201
         except IOError:
@@ -112,6 +123,8 @@ class Scenario(Resource):
         except IOError:
             abort(404, message="Scenario %s does not exist" % (_id))
 
+    def options(self):
+      pass
 
     def get(self, _id):
 

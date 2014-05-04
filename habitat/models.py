@@ -7,6 +7,7 @@ from habitat import tasks, app
 from mongoengine import StringField, PolygonField, DateTimeField, PointField, StringField, DictField, DynamicDocument, Document, ObjectIdField
 from mongoengine import signals
 from mongoengine import DoesNotExist
+import hashlib
 
 class Location(DynamicDocument):
 
@@ -43,13 +44,20 @@ class Scenario():
 
     def validate(self):
         try:
-            behave_parser.parse_feature(data)
+            behave_parser.parse_feature(self.code)
             return True
         except behave_parser.ParserError:
-            raise False
+            return False
 
     def save(self):
-        pass
+
+        if not self.id:
+            self.id = hashlib.sha1(self.code).hexdigest() 
+
+        file_path = Scenario._get_feature_file_name(self.id)
+        file_ref = open(file_path, 'w')
+        file_ref.write(self.code)
+        return self
 
     def delete(self):
         file_path = Scenario._get_feature_file_name(self.id)
@@ -62,6 +70,8 @@ class Scenario():
     def get(_id):
 
         file_path = Scenario._get_feature_file_name(_id)
+        print file_path
+
         feature = behave_parser.parse_file(file_path)
         code = Scenario._feature_to_string(feature)
         _id = os.path.basename(file_path).split('.')[0]
