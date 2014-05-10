@@ -10,3 +10,4 @@ import-data
 celerybeat-schedule.db
 local_config.py
 habitat.log
+habitat/static/vendor
