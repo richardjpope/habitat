@@ -1,0 +1,17 @@
+body, .btn, input, .CodeMirror, code {
+    font-family: 'Roboto Slab', serif;
+    font-size:25px;
+    font-style:italic;
+}
+
+body.background-1{
+  background:url('/static/images/backgrounds/13134244664_41ee4121a7_o.jpg');
+}
+
+#main {
+  background:rgba(255,255,255,  0.7);
+  width:60%;
+  margin:80px auto 0 auto;
+  padding:2%;
+  min-height:300px
+}

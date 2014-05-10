@@ -1,0 +1,21 @@
+{
+  "name": "roboto-slab-fontface-bower",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "homepage": "https://github.com/memespring/roboto-slab-fontface-bower",
+  "_release": "05e98a225b",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "05e98a225b899283b2137789d55abcfcdcc2fd36"
+  },
+  "_source": "git://github.com/memespring/roboto-slab-fontface-bower.git",
+  "_target": "*",
+  "_originalSource": "roboto-slab-fontface",
+  "_direct": true
+}
