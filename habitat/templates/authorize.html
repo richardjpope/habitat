@@ -1,21 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Authorization</title>
-</head>
-<body>
-  <p>Client: {{ client.client_id }}</p>
+{% extends "base.html" %}
+{% block content %}
+  <h2>{{ client.client_id }} wants:</h2>
+  <ul>
+    {% for key,value in avaliable_scopes.iteritems() %}
+        {% for scope in scopes %}
+          {% if scope == key %}
+              <li>{{value|lower}}</li>
+          {% endif %}
+        {% endfor %}
+    {% endfor %}
+  </ul>
+
   <form action="/oauth/authorize" method="post">
-    <p>Allow access?</p>
     <input type="hidden" name="client_id" value="{{ client.client_id }}">
     <input type="hidden" name="scope" value="{{ scopes|join(' ') }}">
     <input type="hidden" name="response_type" value="{{ response_type }}">
     {% if state %}
-    <input type="hidden" name="state" value="{{ state }}">
+      <input type="hidden" name="state" value="{{ state }}">
     {% endif %}
-    <input type="submit" name="confirm" value="yes">
-    <input type="submit" name="confirm" value="no">
+    <input type="submit" class="button" name="confirm" value="yes">
+    <input type="submit" class="button secondary" name="confirm" value="no">
   </form>
-</body>
-</html>
+{% endblock %}

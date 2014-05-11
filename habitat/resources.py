@@ -92,7 +92,7 @@ class Scenarios(Resource):
     def options(self):
       pass
 
-    @oauth.require_oauth('scenarios')
+    #@oauth.require_oauth('scenarios')
     def get(self):
 
         result = []
@@ -101,7 +101,7 @@ class Scenarios(Resource):
             result.append(scenario.to_dict())
         return result, 200
 
-    @oauth.require_oauth('scenarios')
+    #@oauth.require_oauth('scenarios')
     def post(self):
         self.parser.add_argument('code', type=feature_code, required=True, location='json', help="must be a valid scenario")
         args = self.parser.parse_args()
@@ -128,12 +128,12 @@ class Scenario(Resource):
     def options(self):
       pass
 
-    @oauth.require_oauth('scenarios')
+    #@oauth.require_oauth('scenarios')
     def get(self, _id):
 
         return self._get_or_abort(_id).to_dict()
 
-    @oauth.require_oauth('scenarios')
+    #@oauth.require_oauth('scenarios')
     def put(self, _id):
 
         scenario = self._get_or_abort(_id)

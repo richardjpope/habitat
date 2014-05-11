@@ -44,7 +44,6 @@ class AuthClient(Document):
     def validate_scopes(self, scopes):
         return True
 
-
 class AuthGrant(Document):
 
     client = ReferenceField(AuthClient)

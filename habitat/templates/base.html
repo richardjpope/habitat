@@ -2,14 +2,23 @@
   <head>
     <title>habitat</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='vendor/roboto-slab-fontface/roboto-slab-fontface.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='vendor/foundation/css/foundation.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/main.css') }}">
     <script type="text/javascript" src="{{ url_for('static', filename='javascript/main.js') }}"></script>
   </head>
   <body class="background-1">
-    <div id="main">
-      {% block content %}
 
-      {% endblock %}
+<!--     <nav class="top-bar" data-topbar>
+        {% if session.admin %}
+          <a href="{{url_for('admin_logout')}}">Sign out</a>
+        {% endif %}
+    </nav> -->
+    <div class="row">
+      <div id="main" class="small-10 small-centered columns">
+        {% block content %}
+
+        {% endblock %}
+      </div>
     </div>
   </body>
 </html>

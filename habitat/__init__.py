@@ -22,6 +22,7 @@ api.decorators=[cors.crossdomain(origin='*', headers = "content-type,accept")]
 #oauth
 oauth = OAuth2Provider(app)
 
+
 #logging
 # file_handler = logging.handlers.RotatingFileHandler(app.config['HABITAT_LOG_FILE'], maxBytes=1024 * 1024 * 100, backupCount=20)
 # file_handler.setLevel(logging.DEBUG)

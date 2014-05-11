@@ -1,4 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-  Hello.
+  <h1>Hello.</h1>
+  <a href="{{url_for('admin_logout')}}" class="button expand">Sign out</a>
+  <a href="{{url_for('authorized')}}" class="button expand">Authorized apps</a>
 {% endblock %}

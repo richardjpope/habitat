@@ -3,29 +3,45 @@ from models import AuthClient, AuthGrant, AuthToken
 from habitat import oauth
 from mongoengine import DoesNotExist
 from datetime import datetime, timedelta
+from functools import wraps
+from flask import request
 
-scopes = [
-  {'scenarios': 'Premission to view, edit and add scenarios'},
-  {'location:view': 'Premission to view location history'},
-  {'location:add': 'Premission to add to location history'},
-]
+scopes = {'scenarios': 'Premission to view, edit and add scenarios',
+  'location:view': 'Premission to view location history',
+  'location:add': 'Premission to add to location history',
+  'email': 'Premission to add to location history',
+}
+
+# a decorator for creating a new client automatically
+def pre_authorize_handler(f):
+
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        if request.method == 'GET' and request.args.get('client_id'):
+            try:
+                client = AuthClient.objects.get(client_id=request.args.get('client_id'))
+            except DoesNotExist:
+
+                client = AuthClient()
+                client.client_id = request.args.get('client_id')
+                client.client_secret = 'secret'
+                client.name = ''
+                client._redirect_uris=request.args.get('redirect_uri')
+                client.save()
+
+        return f(*args, **kwargs)
+
+    return decorated
+
 
 @oauth.clientgetter
 def load_client(client_id):
 
     try:
-      return AuthClient.objects.get(client_id=client_id)
+        return AuthClient.objects.get(client_id=client_id)
     except DoesNotExist:
-
-      #if doesnt exist, create it
-      client = AuthClient()
-      client.client_id = client_id
-      client.client_secret = 'secret'
-      client.name = 'name'
-      client._redirect_uris=u'http://127.0.0.1:8001/authorized'
-      client.save()
-
-      return client
+        return None
 
 @oauth.grantgetter
 def load_grant(client_id, code):
@@ -84,7 +100,5 @@ def save_token(token_data, request, *args, **kwargs):
     token.client = client
 
     token.save()
-    # token = token.save()
-    # print token
-    # print "--------------"
+
     return token
