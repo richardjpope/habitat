@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Authorized apps</h1>
+  {% if tokens %}
+    <form id="form_id" action="" method="post">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Persmissions</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        {% for token in tokens %}
+          <tr>
+            <td>{{token.client.client_id}}</td>
+            <td>
+              <ul>
+                {% for scope in token.scopes %}
+                  <li>{{scope}}</li>
+                {% endfor %}
+              </ul>
+            </td>
+            <td><button type="submit" value="{{token.id}}" name="revoke" class="button tiny alert">Revoke</button></td>
+          </tr>
+        {% endfor %}
+      </table>
+    </form>
+  {% else %}
+    <p>There are no authorized apps.</p>
+  {% endif %}
+{% endblock %}

@@ -17,13 +17,15 @@ def hello():
 @app.route('/signin', methods=['GET', 'POST'])
 def admin_login():
     form = forms.AdminLoginForm(request.form)
-
+    failed=False
     if request.method == 'POST' and form.validate():
         if app.config['ADMIN_USERNAME'] == form.data['username'] and app.config['ADMIN_PASSWORD'] == form.data['password']:
             session['admin'] = True
             return redirect(url_for('hello'))
+        else:
+            failed=True
 
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, failed=failed)
 
 @app.route('/signout')
 def admin_logout():

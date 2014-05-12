@@ -6,6 +6,7 @@
   - hash admin password
   - add stats to homepage
   - setup script
+  - test setup
 
 DONE:
 - ability to delete token

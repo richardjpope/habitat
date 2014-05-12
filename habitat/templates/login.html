@@ -3,10 +3,15 @@
 {% block content %}
   <h1>Sign in</h1>
   <form action="" method="post">
-       {{ render_field(form.username) }}
-       {{ render_field(form.password) }}
-      <p>
-          <input type="submit" class="button" value="Sign in">
-      </p>
+    {% if failed %}
+      <div data-alert class="alert-box alert">
+          Invalid username or password
+      </div>
+    {% endif %}
+    {{ render_field(form.username) }}
+    {{ render_field(form.password) }}
+    <p>
+        <input type="submit" class="button" value="Sign in">
+    </p>
   </form>
 {% endblock %}

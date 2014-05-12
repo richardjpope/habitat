@@ -3,11 +3,24 @@ body, h1, h2, .button, table {
     font-style:italic;
 }
 
+/*nav .breadcrumbs {
+  background:transparent;
+  border:none;
+}
+
+nav .breadcrumbs a {
+  color:#f
+}*/
+
 body.background-1{
   background:url('/static/images/backgrounds/13134244664_41ee4121a7_o.jpg');
   background-repeat:no-repeat;
   background-size:cover;
   background-position:center;
+}
+
+.alert-box {
+    border:none;
 }
 
 table {
