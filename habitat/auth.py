@@ -6,10 +6,10 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import request
 
-scopes = {'scenarios': 'Premission to view, edit and add scenarios',
-  'location:view': 'Premission to view location history',
-  'location:add': 'Premission to add to location history',
-  'email': 'Premission to add to location history',
+scopes = {'scenarios': 'Permission to view, edit and add scenarios',
+  'location:view': 'Permission to view location history',
+  'location:add': 'Permission to add to location history',
+  'email': 'Permission to add to location history',
 }
 
 # a decorator for creating a new client automatically
@@ -25,7 +25,7 @@ def pre_authorize_handler(f):
 
                 client = AuthClient()
                 client.client_id = request.args.get('client_id')
-                client.client_secret = 'secret'
+                client.client_secret = 'BfP7jsN8dSsXjGLfTTPiEvarMJOpkZQ2Y7IVVee8X929LfolMV'
                 client.name = ''
                 client._redirect_uris=request.args.get('redirect_uri')
                 client.save()
@@ -70,13 +70,17 @@ def save_grant(client_id, code, request, *args, **kwargs):
 
     return grant
 
+@oauth.usergetter
+def get_user(username, password, *args, **kwargs):
+    return True
+
 @oauth.tokengetter
 def load_token(access_token=None, refresh_token=None):
 
     if access_token:
-        return AuthGrant.get(access_token=access_token)
+        return AuthToken.objects.get(access_token=access_token)
     elif refresh_token:
-        return AuthGrant.get(refresh_token=refresh_token)
+        return AuthToken.objects.get(refresh_token=refresh_token)
 
 @oauth.tokensetter
 def save_token(token_data, request, *args, **kwargs):

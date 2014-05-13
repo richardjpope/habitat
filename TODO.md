@@ -7,6 +7,7 @@
   - add stats to homepage
   - setup script
   - test setup
+  - make sure can only post to auth setup from same domain
 
 DONE:
 - ability to delete token

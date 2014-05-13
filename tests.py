@@ -1,38 +1,67 @@
-import json
+import os
 import unittest
-from habitat import app
+import urllib
+import urllib2
+from client import app as client_app
+import mechanize
+import threading
+import multiprocessing
+import time
+from habitat import app as server_app
 
-class TestHabitat(unittest.TestCase):
+SERVER_URL = 'http://localhost:5000'
+CLIENT_URL = 'http://127.0.0.1:8010'
+
+class HabitatTests(unittest.TestCase):
 
     def setUp(self):
-        self.app = app.test_client()
 
-    def login(self, username, password):
-        return self.app.post('/signin', data=dict(
-            username=username,
-            password=password
-        ), follow_redirects=True)
+        self.browser = mechanize.Browser()
 
-    def logout(self):
-        return self.app.get('/signout', follow_redirects=True)
+    def login_server(self):
+        self.browser.open(SERVER_URL + '/signin')
+        self.browser.form = list(self.browser.forms())[0]
+        self.browser['username'] = 'admin'
+        self.browser['password'] = 'admin'
+        response = self.browser.submit()
+        return response.read()
+
+    def logout_server(self):
+        response = self.browser.open(SERVER_URL + '/signout')
+
+        return response.read()
+
+    def authorize_client(self):
+        response = self.browser.open(CLIENT_URL)
+        data = response.read()
+
+        self.browser.form = list(self.browser.forms())[0]
+        response = self.browser.submit(nr=0)
+        return response.read()
+
+    def test_auth(self):
+
+        data = self.login_server()
+        assert 'Sign out' in data
+
+        data = self.authorize_client()
+        assert 'oauth_token' in data
 
     def test_login_logout(self):
-        rv = self.login(app.config['ADMIN_USERNAME'], app.config['ADMIN_PASSWORD'])
-        print rv.location
-        assert 'Hello.' in rv.data
-        rv = self.logout()
-        assert 'Sign in' in rv.data
-        rv = self.login('', '')
-        assert 'User name is required' in rv.data
-        assert 'Password is required' in rv.data
-        rv = self.login("xx%s" % app.config['ADMIN_USERNAME'], "xx%s" % app.config['ADMIN_PASSWORD'])
-        assert 'Invalid username or password' in rv.data
 
-    # def test_entry(self):
-    #
-    #     data = {"id": "530cd73044c01ce9cffa4d9d", "latlng": {"coordinates": [0.32,0.32], "type": "Point"}, "occured_at": "2014-02-24T16:26:11.059000"}
-    #     rv = self.app.post('/locations', data=json.dumps(data), content_type='application/json')
-    #     self.assertEqual(rv.status_code, 201)
+        data = self.login_server()
+        assert 'Sign out' in data
+
+        data = self.logout_server()
+        assert 'Sign in' in data
+
+class MyTests(HabitatTests):
+    def test_test(self):
+        assert 1 == 1
+
+    def test_test1(self):
+        assert 1 == 1
+
 
 if __name__ == '__main__':
     unittest.main()

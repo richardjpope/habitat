@@ -10,7 +10,7 @@
         {% endfor %}
     {% endfor %}
   </ul>
-
+{{scopes}}
   <form action="/oauth/authorize" method="post">
     <input type="hidden" name="client_id" value="{{ client.client_id }}">
     <input type="hidden" name="scope" value="{{ scopes|join(' ') }}">

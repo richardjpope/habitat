@@ -27,13 +27,16 @@ class AuthClient(Document):
     @property
     def redirect_uris(self):
         if self._redirect_uris:
-            print self._redirect_uris.split()
             return self._redirect_uris.split()
         return []
 
     @property
     def default_redirect_uri(self):
-        return self.redirect_uris[0]
+        redirect_uris = self.redirect_uris
+        if len(redirect_uris) > 0:
+            return self.redirect_uris[0]
+        else:
+            return None
 
     @property
     def default_scopes(self):
@@ -74,7 +77,6 @@ class AuthToken(Document):
         if self._scopes:
             return self._scopes.split()
         return []
-
 
 class Location(DynamicDocument):
 

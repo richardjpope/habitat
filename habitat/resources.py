@@ -56,6 +56,7 @@ class Locations(Resource):
         self.parser = reqparse.RequestParser()
         super(Locations, self).__init__()
 
+
     def get(self):
     	result = []
         locations = models.Location.objects()
