@@ -8,6 +8,9 @@
   - setup script
   - test setup
   - make sure can only post to auth setup from same domain
+  - rename latlng to lnglat
+  - location api should return geojson points
+  - seperate testing config
 
 DONE:
 - ability to delete token

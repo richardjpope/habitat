@@ -53,6 +53,7 @@ def access_token():
 @auth.pre_authorize_handler
 @oauth.authorize_handler
 def authorize(*args, **kwargs):
+
     if request.method == 'GET':
         client = None
         client = AuthClient.objects.get(client_id=request.args.get('client_id'))

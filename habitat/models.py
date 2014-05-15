@@ -68,9 +68,13 @@ class AuthToken(Document):
     client = ReferenceField(AuthClient)
     token_type = StringField()
     access_token = StringField(unique=True)
-    refresh_token = StringField(unique=True)
+    refresh_token = StringField()
     expires = DateTimeField()
     _scopes = StringField()
+
+    @property
+    def user(self):
+        return None
 
     @property
     def scopes(self):
@@ -80,11 +84,11 @@ class AuthToken(Document):
 
 class Location(DynamicDocument):
 
-    latlng = PointField()
+    lnglat = PointField()
     occured_at = DateTimeField()
 
     def to_dict(self):
-        return {'id': str(self.id), 'latlng': self.latlng, 'occured_at': self.occured_at.isoformat()}
+        return {'id': str(self.id), 'lnglat': self.lnglat, 'occured_at': self.occured_at.isoformat()}
 
     @classmethod
     def post_save(cls, sender, document, **kwargs):
@@ -139,7 +143,6 @@ class Scenario():
     def get(_id):
 
         file_path = Scenario._get_feature_file_name(_id)
-        print file_path
 
         feature = behave_parser.parse_file(file_path)
         code = Scenario._feature_to_string(feature)

@@ -5,10 +5,11 @@ from mongoengine import DoesNotExist
 from datetime import datetime, timedelta
 from functools import wraps
 from flask import request
+import urllib
 
 scopes = {'scenarios': 'Permission to view, edit and add scenarios',
-  'location:view': 'Permission to view location history',
-  'location:add': 'Permission to add to location history',
+  'locations:view': 'Permission to view location history',
+  'locations:add': 'Permission to add to location history',
   'email': 'Permission to add to location history',
 }
 
@@ -65,29 +66,27 @@ def save_grant(client_id, code, request, *args, **kwargs):
     grant.redirect_uri=request.redirect_uri
     grant._scopes=' '.join(request.scopes)
     grant.expires=expires
-
     grant.save()
 
     return grant
-
-@oauth.usergetter
-def get_user(username, password, *args, **kwargs):
-    return True
+#
+# @oauth.usergetter
+# def get_user(username, password, *args, **kwargs):
+#     return True
 
 @oauth.tokengetter
 def load_token(access_token=None, refresh_token=None):
-
     if access_token:
-        return AuthToken.objects.get(access_token=access_token)
+        return AuthToken.objects(access_token=access_token)[0]
     elif refresh_token:
-        return AuthToken.objects.get(refresh_token=refresh_token)
+        return AuthToken.objects(refresh_token=refresh_token)[0]
 
 @oauth.tokensetter
 def save_token(token_data, request, *args, **kwargs):
 
     client = load_client(request.client.client_id)
 
-    # make sure that every client has only one token connected to a user
+    # make sure that every client has only one token
     existing_tokens = AuthToken.objects(client=client)
     for token in existing_tokens:
         token.delete()
@@ -96,10 +95,10 @@ def save_token(token_data, request, *args, **kwargs):
     expires = datetime.utcnow() + timedelta(seconds=expires_in)
 
     token = AuthToken()
-    token.access_token=token_data['access_token']
-    token.refresh_token=token_data['refresh_token']
-    token.token_type=token_data['token_type']
-    token._scopes=token_data['scope']
+    token.access_token = token_data['access_token']
+    #token.refresh_token=token_data['refresh_token']
+    token.token_type = token_data['token_type']
+    token._scopes = urllib.unquote_plus(token_data['scope'])
     token.expires=expires
     token.client = client
 

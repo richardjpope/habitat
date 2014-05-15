@@ -17,11 +17,10 @@ db = MongoEngine(app)
 
 #api
 api = restful.Api(app)
-api.decorators=[cors.crossdomain(origin='*', headers = "content-type,accept")]
+api.decorators=[cors.crossdomain(origin='*', headers = "origin,content-type,accept,authorization")]
 
 #oauth
 oauth = OAuth2Provider(app)
-
 
 #logging
 # file_handler = logging.handlers.RotatingFileHandler(app.config['HABITAT_LOG_FILE'], maxBytes=1024 * 1024 * 100, backupCount=20)
