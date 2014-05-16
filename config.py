@@ -6,7 +6,6 @@ PLUGINS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'plugins'
 
 HABITAT_LOG_FILE = 'habitat.log'
 CELERYBEAT_SCHEDULE = {}
-EMAIL_FROM = 'alert@habitat'
 
 try:
 	from local_config import *

@@ -25,7 +25,6 @@ class HabitatTests(unittest.TestCase):
     def auth_headers(self, access_token):
         return {'Authorization': 'Bearer %s' % access_token, 'Accept': 'application/json'}
 
-
     def login(self, username, password):
         return self.app.post('/signin', data=dict(
             username=username,
@@ -97,7 +96,7 @@ class HabitatTests(unittest.TestCase):
       return access_token
 
     def test_plugins(self):
-      
+
         access_token = self.get_access_token('scenarios')
         rv = self.app.put('/plugins', headers=self.auth_headers(access_token))
         assert rv.status == '200 OK'

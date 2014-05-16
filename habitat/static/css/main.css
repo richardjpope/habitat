@@ -53,3 +53,7 @@ nav.top-bar a {
   padding:2%;
   min-height:300px
 }
+
+.permissions {
+  min-height:6rem;
+}

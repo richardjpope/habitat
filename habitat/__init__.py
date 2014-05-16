@@ -23,15 +23,11 @@ api.decorators=[cors.crossdomain(origin='*', headers = "origin,content-type,acce
 oauth = OAuth2Provider(app)
 
 #logging
-# file_handler = logging.handlers.RotatingFileHandler(app.config['HABITAT_LOG_FILE'], maxBytes=1024 * 1024 * 100, backupCount=20)
-# file_handler.setLevel(logging.DEBUG)
-# file_handler.setFormatter(logging.Formatter('%(asctime)s, %(levelname)s, %(message)s'))
-#app.logger.setLevel(logging.DEBUG)
-#app.logger.addHandler(file_handler)
-
-# authlog = logging.getLogger('flask_oauthlib')
-# authlog.setLevel(logging.INFO)
-# authlog.addHandler(file_handler)
+file_handler = logging.handlers.RotatingFileHandler(app.config['HABITAT_LOG_FILE'], maxBytes=1024 * 1024 * 100, backupCount=20)
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(logging.Formatter('%(asctime)s, %(levelname)s, %(message)s'))
+app.logger.setLevel(logging.DEBUG)
+app.logger.addHandler(file_handler)
 
 #tasks
 celery = Celery('app', broker=app.config['CELERY_BROKER_URL'])

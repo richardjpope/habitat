@@ -17,11 +17,11 @@ def step_impl(context, time):
     # match = re.search('^\[-?(\d+\.?\d*),-?(\d+\.?\d*)\]$', location)
     # assert match
     #
-    # #latlng = [float(match.group(1)), float(match.group(2))]
-    # #location = models.Location.objects(latlng__near=latlng, latlng__max_distance=distance, occured_at__lte=since)
+    # #lnglat = [float(match.group(1)), float(match.group(2))]
+    # #location = models.Location.objects(lnglat__near=lnglat, lnglat__max_distance=distance, occured_at__lte=since)
     # since = datetime.now() - timedelta(minutes=5)
     # lat = float(match.group(1))
     # lng = float(match.group(2))
-    # # location = models.Location.objects(latlng__within_distance=[(lat,lng),distance], occured_at__gte=since)
+    # # location = models.Location.objects(lnglat__within_distance=[(lat,lng),distance], occured_at__gte=since)
     # location = [1]
     # assert len(location) > 0

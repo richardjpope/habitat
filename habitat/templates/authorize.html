@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
   <h2>{{ client.client_id }} wants:</h2>
-  <ul>
+
+  <ul class="permissions">
     {% for key,value in avaliable_scopes.iteritems() %}
         {% for scope in scopes %}
           {% if scope == key %}
@@ -10,7 +11,7 @@
         {% endfor %}
     {% endfor %}
   </ul>
-{{scopes}}
+
   <form action="/oauth/authorize" method="post">
     <input type="hidden" name="client_id" value="{{ client.client_id }}">
     <input type="hidden" name="scope" value="{{ scopes|join(' ') }}">
@@ -18,7 +19,7 @@
     {% if state %}
       <input type="hidden" name="state" value="{{ state }}">
     {% endif %}
-    <input type="submit" class="button" name="confirm" value="yes">
-    <input type="submit" class="button secondary" name="confirm" value="no">
+    <button type="submit" class="button" name="confirm" value="yes">Yes</button>
+    <button type="submit" class="button  secondary" name="confirm" value="no">No</button>
   </form>
 {% endblock %}
