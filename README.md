@@ -11,6 +11,27 @@ Feature: Near a point in space
         Then ping "http://example.com/tad-ah"
 ```
 
+##Setup
+
+1. Install mongodb
+2. Install pip and virtualenv
+2. Install bower
+3. Clone this repository:
+
+  ```
+  git clone git@github.com:memespring/habitat.git
+  ```
+
+4. Setup virtual environment and install dependancies
+
+    ```
+    cd habitat
+    virtualenv .
+    source bin/activate
+    pip install -r  requirements.txt
+    bower install
+    ```
+
 ## Running
 
 1. Start Mongo DB (if it isnt already running):

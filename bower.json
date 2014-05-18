@@ -12,6 +12,11 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
-  ]
+    "tests",
+    "habitat/static/vendor"
+  ],
+  "dependencies": {
+    "foundation": "zurb/bower-foundation#~5.2.2",
+    "roboto-slab-fontface": "*"
+  }
 }
