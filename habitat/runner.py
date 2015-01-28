@@ -32,7 +32,6 @@ class Runner(ModelRunner):
             exec_file(file_path, step_module_globals)
             matchers.current_matcher = default_matcher
 
-
     def feature_locations(self):
 
         locations = []
