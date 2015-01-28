@@ -32,7 +32,7 @@ def admin_logout():
     session.clear()
     return redirect(url_for('hello'))
 
-@app.route('/oauth', methods=['GET', 'POST'])
+@app.route('/settings', methods=['GET', 'POST'])
 @admin_login_required
 def authorized():
     if request.method == 'POST':

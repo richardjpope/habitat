@@ -3,14 +3,9 @@ body, h1, h2, .button, table {
     font-style:italic;
 }
 
-/*nav .breadcrumbs {
-  background:transparent;
-  border:none;
+h1 {
+  margin-bottom: 2rem;
 }
-
-nav .breadcrumbs a {
-  color:#f
-}*/
 
 body.background-1{
   background:url('/static/images/backgrounds/13134244664_41ee4121a7_o.jpg');
@@ -37,21 +32,13 @@ th {
   border-bottom:solid 1px #000;
 }
 
-/*
-nav.top-bar {
-  font-size:0.8rem;
-}
-
-nav.top-bar a {
-  color:#fff;
-}*/
 
 #main {
   font-size:25px;
   background:rgba(255,255,255,  0.7);
   margin:80px auto 0 auto;
   padding:2%;
-  min-height:300px
+  min-height:275px
 }
 
 .permissions {

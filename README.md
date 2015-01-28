@@ -2,7 +2,7 @@
 
 Habitat is an external brain. It does things in response to your interactions with your digital-physical environment using behavior-driven development style tests. (Think self-hosted Google Now meets If This Then That).
 
-It doesn't do much on its own, for that you will need some client apps:
+It doesn't do much on its own, this app is just the habitat server, you will also need some client apps:
 
 * [Example client for writing scenarios](https://github.com/memespring/habitat-scenario-client)
 * [Example client for reporting location](https://github.com/memespring/habitat-location-client)
